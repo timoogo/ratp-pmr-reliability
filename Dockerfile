@@ -1,0 +1,42 @@
+# --- Build stage ---
+    FROM node:20-alpine AS builder
+    WORKDIR /app
+    
+    # Injecte la variable d’environnement
+    ARG DATABASE_URL
+    ENV DATABASE_URL=$DATABASE_URL
+    
+    COPY package.json package-lock.json ./
+    RUN npm ci
+    
+    COPY . .
+    
+    # Génération du client Prisma
+    RUN npx prisma generate
+    
+    # Compilation du fichier seed.ts en seed.js
+    RUN npm run build:seed && echo "✅ seed.js compilé :" && ls -la dist/
+    
+    # Build Next.js
+    RUN npm run build
+    
+    # --- Runner stage ---
+    FROM node:20-alpine AS runner
+    WORKDIR /app
+    
+    # Injecte la variable à nouveau ici
+    ARG DATABASE_URL
+    ENV DATABASE_URL=$DATABASE_URL
+    
+    ENV NODE_ENV=production
+    
+    COPY --from=builder /app/node_modules ./node_modules
+    COPY --from=builder /app/.next ./.next
+    COPY --from=builder /app/public ./public
+    COPY --from=builder /app/package.json ./
+    COPY --from=builder /app/dist ./dist
+    COPY --from=builder /app/prisma ./prisma
+    
+    # Migration et seed
+    
+    CMD ["npm", "run", "start"]
