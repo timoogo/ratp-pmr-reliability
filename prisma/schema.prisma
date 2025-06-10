@@ -24,6 +24,7 @@ model Station {
   id         String      @id @default(cuid())
   name       String
   code       String      @unique
+  slug       String      @unique
   line       String
   family     String
   equipments Equipment[] // 1 station -> N équipements

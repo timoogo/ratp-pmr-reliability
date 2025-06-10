@@ -10,7 +10,9 @@ exports.mockStations = [
         code: "ART_IDFM_43969",
         line: "14",
         lineSymbol: "M",
-        equipments: []
+        equipments: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
     },
     {
         name: "Saint-Ouen",
@@ -20,7 +22,9 @@ exports.mockStations = [
         code: "ART_IDFM_480289",
         line: "14",
         lineSymbol: "M",
-        equipments: []
+        equipments: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
     },
     {
         name: "Porte de Clichy",
@@ -30,7 +34,9 @@ exports.mockStations = [
         code: "ART_IDFM_473477",
         line: "14",
         lineSymbol: "M",
-        equipments: []
+        equipments: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
     },
     {
         name: "Pont Cardinet",
@@ -40,7 +46,9 @@ exports.mockStations = [
         code: "ART_IDFM_480287",
         line: "14",
         lineSymbol: "M",
-        equipments: []
+        equipments: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
     },
     {
         name: "Saint-Lazare",
@@ -50,7 +58,9 @@ exports.mockStations = [
         code: "ART_IDFM_462374",
         line: "14",
         lineSymbol: "M",
-        equipments: []
+        equipments: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
     },
     {
         name: "Madeleine",
@@ -60,7 +70,9 @@ exports.mockStations = [
         code: "ART_IDFM_43898",
         line: "14",
         lineSymbol: "M",
-        equipments: []
+        equipments: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
     },
     {
         name: "Pyramides",
@@ -70,7 +82,9 @@ exports.mockStations = [
         code: "ART_IDFM_44579",
         line: "14",
         lineSymbol: "M",
-        equipments: []
+        equipments: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
     },
     {
         name: "Châtelet",
@@ -80,7 +94,9 @@ exports.mockStations = [
         code: "ART_IDFM_42587",
         line: "14",
         lineSymbol: "M",
-        equipments: []
+        equipments: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
     },
     {
         name: "Bercy",
@@ -90,7 +106,9 @@ exports.mockStations = [
         code: "ART_IDFM_58728",
         line: "14",
         lineSymbol: "M",
-        equipments: []
+        equipments: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
     },
     {
         name: "Cour Saint-Emilion",
@@ -100,7 +118,9 @@ exports.mockStations = [
         code: "ART_IDFM_45234",
         line: "14",
         lineSymbol: "M",
-        equipments: []
+        equipments: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
     },
     {
         name: "Bibliothèque François Mitterrand",
@@ -110,7 +130,9 @@ exports.mockStations = [
         code: "ART_IDFM_473111",
         line: "14",
         lineSymbol: "M",
-        equipments: []
+        equipments: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
     },
     {
         name: "Olympiades",
@@ -120,6 +142,8 @@ exports.mockStations = [
         code: "ART_IDFM_479056",
         line: "14",
         lineSymbol: "M",
-        equipments: []
+        equipments: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
     },
 ];

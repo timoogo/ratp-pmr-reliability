@@ -1,4 +1,4 @@
-import { EquipmentDetail } from "@/types/elevator";
+import { EquipmentDetail } from "../types/elevator";
 import { mockStations } from "./stations";
 
 export const mockEquipments: EquipmentDetail[] = [

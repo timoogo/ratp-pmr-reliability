@@ -1,5 +1,4 @@
-import { Station } from "@/types/station";
-import { StationWithEquipments } from "@/types/station.types";
+import { StationWithEquipments } from "../types/station.types";
 
 export const mockStations: StationWithEquipments[] = [
   {
@@ -10,7 +9,9 @@ export const mockStations: StationWithEquipments[] = [
     code: "ART_IDFM_43969",
     line: "14",
     lineSymbol: "M",
-    equipments:[]
+    equipments: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
   },
   {
     name: "Saint-Ouen",
@@ -20,7 +21,9 @@ export const mockStations: StationWithEquipments[] = [
     code: "ART_IDFM_480289",
     line: "14",
     lineSymbol: "M",
-    equipments:[]
+    equipments: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
   },
   {
     name: "Porte de Clichy",
@@ -29,8 +32,10 @@ export const mockStations: StationWithEquipments[] = [
     family: "metro",
     code: "ART_IDFM_473477",
     line: "14",
-      lineSymbol: "M",
-        equipments:[]
+    lineSymbol: "M",
+    equipments: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
   },
   {
     name: "Pont Cardinet",
@@ -40,7 +45,9 @@ export const mockStations: StationWithEquipments[] = [
     code: "ART_IDFM_480287",
     line: "14",
     lineSymbol: "M",
-    equipments:[]
+    equipments: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
   },
   {
     name: "Saint-Lazare",
@@ -50,7 +57,9 @@ export const mockStations: StationWithEquipments[] = [
     code: "ART_IDFM_462374",
     line: "14",
     lineSymbol: "M",
-    equipments:[]
+    equipments: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
   },
   {
     name: "Madeleine",
@@ -60,7 +69,9 @@ export const mockStations: StationWithEquipments[] = [
     code: "ART_IDFM_43898",
     line: "14",
     lineSymbol: "M",
-    equipments:[]
+    equipments: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
   },
   {
     name: "Pyramides",
@@ -70,7 +81,9 @@ export const mockStations: StationWithEquipments[] = [
     code: "ART_IDFM_44579",
     line: "14",
     lineSymbol: "M",
-    equipments:[]
+    equipments: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
   },
   {
     name: "Châtelet",
@@ -80,7 +93,9 @@ export const mockStations: StationWithEquipments[] = [
     code: "ART_IDFM_42587",
     line: "14",
     lineSymbol: "M",
-    equipments:[]
+    equipments: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
   },
   {
     name: "Bercy",
@@ -90,7 +105,9 @@ export const mockStations: StationWithEquipments[] = [
     code: "ART_IDFM_58728",
     line: "14",
     lineSymbol: "M",
-    equipments:[]
+    equipments: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
   },
   {
     name: "Cour Saint-Emilion",
@@ -100,7 +117,9 @@ export const mockStations: StationWithEquipments[] = [
     code: "ART_IDFM_45234",
     line: "14",
     lineSymbol: "M",
-    equipments:[]
+    equipments: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
   },
   {
     name: "Bibliothèque François Mitterrand",
@@ -110,7 +129,9 @@ export const mockStations: StationWithEquipments[] = [
     code: "ART_IDFM_473111",
     line: "14",
     lineSymbol: "M",
-    equipments:[]
+    equipments: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
   },
   {
     name: "Olympiades",
@@ -120,6 +141,8 @@ export const mockStations: StationWithEquipments[] = [
     code: "ART_IDFM_479056",
     line: "14",
     lineSymbol: "M",
-    equipments:[]
+    equipments: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
   },
-] as const satisfies Station[];
+];

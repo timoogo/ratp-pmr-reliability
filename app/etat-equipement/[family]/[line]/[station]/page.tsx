@@ -1,17 +1,17 @@
 import { notFound } from "next/navigation";
-import { mockStations } from "@/mock/stations";
+import { prisma } from "@/lib/prisma";
 import { ContentCardWrapper } from "@/components/ContentCardWrapper";
 
-export default function StationDetailPage({ params }: any) {
+export default async function StationDetailPage({ params }: any) {
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   const { family, line, station } = params;
 
-  const stationData = mockStations.find(
-    (s) =>
-      s.family.toLowerCase() === family.toLowerCase() &&
-      s.line === line &&
-      s.slug === station.toLowerCase()
-  );
-
+  const stationData = await prisma.station.findUnique({
+    where: {
+      slug: station,
+    },
+  });
+  console.log("params.station =", station);
   if (!stationData) return notFound();
 
   return (

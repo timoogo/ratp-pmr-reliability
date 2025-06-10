@@ -1,4 +1,4 @@
-import { EquipmentDetail } from "./elevator";
+import { Equipment } from "./elevator";
 
 export type Station = {
   line: string;
@@ -8,5 +8,7 @@ export type Station = {
   status: "ok" | "warning" | "current";
   family: "metro" | "rer" | "tramway" | "bus";
   code: string;
-  equipments: EquipmentDetail[];
+  equipments: Equipment[]; // ✅ ici, pas PrismaEquipmentType[]
+  createdAt: Date;
+  updatedAt: Date;
 };

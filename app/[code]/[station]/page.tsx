@@ -1,16 +1,19 @@
 import { ContentCardWrapper } from "@/components/ContentCardWrapper";
-import { mockStations } from "@/mock/stations";
 import { notFound } from "next/navigation";
-
-export default function StationPage({ params }: { params:any }) {
+import { prisma } from "@/lib/prisma";
+export default async function StationPage({ params }: { params:any }) {
   const { family, line, station } = params;
 
-  const stationData = mockStations.find(
-    (s) =>
-      s.family.toLowerCase() === family.toLowerCase() &&
-      s.line === line &&
-      s.slug === station
-  );
+  const stationData = await prisma.station.findUnique({
+    where: {
+      family: family,
+      line: line,
+      code: station,
+    },
+    include: {
+      equipments: true,
+    },
+  });
 
   if (!stationData) return notFound();
 
@@ -33,17 +36,12 @@ export default function StationPage({ params }: { params:any }) {
                 <div className="flex-1">
                   <p className="text-sm font-medium text-gray-900">
                     <span className="font-semibold">Situation :</span>{" "}
-                    {eq.situation?.raw ||
-                      `${eq.situation?.levels?.from ?? ""} vers ${
-                        eq.situation?.levels?.to ?? ""
-                      } — ${eq.situation?.description ?? ""}`}
+                    {eq.name}
                   </p>
-                  {eq.direction && (
-                    <p className="text-sm mt-1 text-gray-700">
-                      <span className="font-semibold">Direction :</span>{" "}
-                      {eq.direction}
-                    </p>
-                  )}
+                  <p className="text-sm mt-1 text-gray-700">
+                    <span className="font-semibold">Code :</span>{" "}
+                    {eq.code}
+                  </p>
                 </div>
                 <div className="shrink-0 text-green-600 font-semibold">
                   {eq.status === "Disponible" ? (

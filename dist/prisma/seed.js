@@ -1,26 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
+const stations_1 = require("../mock/stations");
 const prisma = new client_1.PrismaClient();
-const mockStations = [
-    { name: "Mairie de Saint-Ouen", code: "ART_IDFM_43969", line: "14", family: "metro" },
-    { name: "Saint-Ouen", code: "ART_IDFM_480289", line: "14", family: "metro" },
-    { name: "Porte de Clichy", code: "ART_IDFM_473477", line: "14", family: "metro" },
-    { name: "Pont Cardinet", code: "ART_IDFM_480287", line: "14", family: "metro" },
-    { name: "Saint-Lazare", code: "ART_IDFM_462374", line: "14", family: "metro" },
-    { name: "Madeleine", code: "ART_IDFM_43898", line: "14", family: "metro" },
-    { name: "Pyramides", code: "ART_IDFM_44579", line: "14", family: "metro" },
-    { name: "Châtelet", code: "ART_IDFM_42587", line: "14", family: "metro" },
-    { name: "Bercy", code: "ART_IDFM_58728", line: "14", family: "metro" },
-    { name: "Cour Saint-Emilion", code: "ART_IDFM_45234", line: "14", family: "metro" },
-    { name: "Bibliothèque François Mitterrand", code: "ART_IDFM_473111", line: "14", family: "metro" },
-    { name: "Olympiades", code: "ART_IDFM_479056", line: "14", family: "metro" },
-];
 const equipmentTypes = [
     "ASCENSEUR",
     "ESCALATOR",
     "PORTILLONS",
-    "CABINE",
+    "CABINES",
 ];
 const equipmentStatuses = [
     "Disponible",
@@ -31,15 +18,26 @@ const equipmentStatuses = [
 function random(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
 }
+function toSlug(str) {
+    return str
+        .toLowerCase()
+        .normalize("NFD") // retire les accents
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9\-]/g, "")
+        .replace(/\-+/g, "-");
+}
 async function main() {
+    console.log("🚀 seed.ts recompilé", new Date());
     await prisma.equipment.deleteMany();
     await prisma.station.deleteMany();
-    for (const station of mockStations) {
+    for (const station of stations_1.mockStations) {
         try {
             const createdStation = await prisma.station.create({
                 data: {
                     name: station.name,
                     code: station.code,
+                    slug: toSlug(station.name), // 🔥 FORCÉ à chaque fois
                     line: station.line,
                     family: station.family,
                     equipments: {
@@ -58,8 +56,8 @@ async function main() {
             console.error(`❌ Erreur sur la station ${station.name} (${station.code}):`, e);
         }
     }
-    console.log(`✅ Stations créées : ${mockStations.length}`);
-    console.log(`✅ Équipements créés : ${mockStations.length * 3}`);
+    console.log(`✅ Stations créées : ${stations_1.mockStations.length}`);
+    console.log(`✅ Équipements créés : ${stations_1.mockStations.length * 3}`);
 }
 main()
     .catch((e) => {

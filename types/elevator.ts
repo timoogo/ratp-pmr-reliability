@@ -1,6 +1,5 @@
-import { Station } from "@/types/station";
-
-export type EquipmentType = "ASCENSEUR" | "ESCALATOR" | "PORTILLONS" | "CABINE";
+import { Station } from "./station";
+import { EquipmentType } from "@prisma/client";
 
 export type EquipmentStatus =
   | "Disponible"
@@ -28,4 +27,17 @@ export type EquipmentDetail = {
       street?: string;
     };
   };
+};
+
+
+
+export type Equipment = {
+  id: string;
+  name: string;
+  code: string;
+  type: EquipmentType;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  stationId: string;
 };

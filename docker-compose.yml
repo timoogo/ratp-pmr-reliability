@@ -21,9 +21,9 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        DATABASE_URL: ${DATABASE_URL}
+        DATABASE_URL: postgres://postgres:postgres@db:5432/ratp_pmr
     environment:
-      DATABASE_URL: ${DATABASE_URL}
+      DATABASE_URL: postgres://postgres:postgres@db:5432/ratp_pmr
     ports:
       - "3000:3000"
       - "5555:5555"

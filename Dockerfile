@@ -27,16 +27,24 @@
     # Injecte la variable à nouveau ici
     ARG DATABASE_URL
     ENV DATABASE_URL=$DATABASE_URL
-    
     ENV NODE_ENV=production
+    
+    # Copie les fichiers nécessaires
     COPY --from=builder /app/app ./app
     COPY --from=builder /app/node_modules ./node_modules
     COPY --from=builder /app/.next ./.next
     COPY --from=builder /app/public ./public
     COPY --from=builder /app/package.json ./
     COPY --from=builder /app/dist ./dist
+    COPY --from=builder /app/mock ./mock
+    COPY --from=builder /app/types ./types
     COPY --from=builder /app/prisma ./prisma
+    COPY --from=builder /app/tsconfig.seed.json ./tsconfig.seed.json
     
-    # Migration et seed
+    # Ajout du script de démarrage
+    COPY ./start.sh ./start.sh
+    RUN chmod +x ./start.sh
     
-    CMD ["npm", "run", "start"]
+    # Commande de démarrage
+    CMD ["./start.sh"]
+    
