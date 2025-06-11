@@ -20,6 +20,19 @@ enum EquipmentType {
   CABINES
 }
 
+enum EquipmentStatus {
+  DISPONIBLE
+  INDISPONIBLE
+  EN_MAINTENANCE
+}
+
+enum IncidentStatus {
+  NOUVEAU
+  EN_COURS
+  RESOLU
+  REJETE
+}
+
 model Station {
   id         String      @id @default(cuid())
   name       String
@@ -38,14 +51,15 @@ model Equipment {
   id              String             @id @default(cuid())
   name            String
   type            EquipmentType
-  status          String
+  status          EquipmentStatus
   code            String             @unique
   stationId       String
   station         Station            @relation(fields: [stationId], references: [id])
   histories       EquipmentHistory[]
   checks          EquipmentCheck[]
   repairs         EquipmentRepair[]
-  displayHistory  Json               @default("{}") // <- ✅ AJOUTÉ ICI
+  incidents       IncidentReport[]    @relation("EquipmentIncidents")
+  displayHistory  Json               @default("{}")
   createdAt       DateTime           @default(now())
   updatedAt       DateTime           @updatedAt
 }
@@ -77,4 +91,20 @@ model EquipmentRepair {
   repairedAt      DateTime   // date de réparation effective
   comment         String?
   createdAt       DateTime   @default(now())
+}
+
+
+
+model IncidentReport {
+  id          String         @id @default(cuid())
+  description String
+  ip          String
+  userAgent   String
+  status      IncidentStatus @default(NOUVEAU)
+
+  equipment   Equipment      @relation("EquipmentIncidents", fields: [equipmentId], references: [id])
+  equipmentId String
+
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
 }

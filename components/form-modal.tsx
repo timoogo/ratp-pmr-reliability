@@ -1,23 +1,53 @@
-// components/ReportIncidentDialog.tsx
 "use client";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+
+type Props = {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  equipmentId: string;
+  onIncidentReported: () => void;
+};
 
 export function ReportIncidentDialog({
   open,
   onOpenChange,
-}: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}) {
+  equipmentId,
+  onIncidentReported,
+}: Props) {
   const [description, setDescription] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: appel API ou mutation
-    onOpenChange(false);
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/incident", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description, equipmentId }),
+      });
+
+      if (!res.ok) throw new Error("Erreur lors de l'envoi");
+
+      onOpenChange(false);
+      setDescription("");
+      onIncidentReported();
+    } catch (err) {
+      console.error(err);
+      alert("Erreur lors de l’envoi du signalement");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -45,7 +75,9 @@ export function ReportIncidentDialog({
           </div>
 
           <DialogFooter>
-            <Button type="submit">Envoyer le signalement</Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? "Envoi..." : "Envoyer le signalement"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

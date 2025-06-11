@@ -9,12 +9,6 @@ const equipmentTypes = [
     "PORTILLONS",
     "CABINES",
 ];
-const equipmentStatuses = [
-    "Disponible",
-    "Indisponible",
-    "En maintenance",
-    "Hors service",
-];
 function random(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
 }
@@ -49,8 +43,7 @@ async function main() {
                             length: Math.floor(Math.random() * 3) + 1,
                         }).map((_, i) => ({
                             type: "ASCENSEUR",
-                            status: random(equipmentStatuses),
-                            name: `Ascenseur ${i + 1}`,
+                            status: random(Object.values(client_1.EquipmentStatus)), name: `Ascenseur ${i + 1}`,
                             code: `ART_IDFM_${Math.floor(100000 + Math.random() * 900000)}`,
                         })),
                     },
@@ -66,7 +59,7 @@ async function main() {
                         data: {
                             equipmentId: equipment.id,
                             date: new Date(Date.now() - 1000 * 60 * 60 * 24 * i), // i jours avant
-                            status: random(equipmentStatuses),
+                            status: random(Object.values(client_1.EquipmentStatus)),
                             comment: `État #${i + 1} généré automatiquement.`,
                         },
                     });
@@ -83,7 +76,7 @@ async function main() {
                     });
                 }
                 // Réparation fictive si KO - 10 entrées si applicable
-                if (equipment.status !== "Disponible") {
+                if (equipment.status !== "DISPONIBLE") {
                     for (let i = 0; i < 10; i++) {
                         await prisma.equipmentRepair.create({
                             data: {

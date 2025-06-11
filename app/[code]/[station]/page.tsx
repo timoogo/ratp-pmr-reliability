@@ -44,7 +44,7 @@ export default async function StationPage({ params }: { params:any }) {
                   </p>
                 </div>
                 <div className="shrink-0 text-green-600 font-semibold">
-                  {eq.status === "Disponible" ? (
+                  {eq.status === "DISPONIBLE".toLocaleLowerCase()   ? (
                     <span className="text-green-600">✔ Disponible</span>
                   ) : (
                     <span className="text-red-600">✘ {eq.status}</span>

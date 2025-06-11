@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Equipment, EquipmentHistory } from "@prisma/client";
 import { ContentCardWrapper } from "@/components/ContentCardWrapper";
+import { ReportIncidentDialog } from "@/components/form-modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,28 +10,78 @@ import {
   StepperItem,
   StepperTitle,
 } from "@/components/ui/stepper";
-import { ReportIncidentDialog } from "@/components/form-modal";
+import {
+  Equipment,
+  EquipmentHistory,
+  EquipmentStatus,
+  IncidentReport,
+} from "@prisma/client";
+import { useEffect, useState } from "react";
+import { IncidentList } from "./IncidentList";
 
 type Props = {
   equipmentData: Equipment & {
     station: any;
     histories: EquipmentHistory[];
+    incidents: IncidentReport[];
     checks: any[];
     repairs: any[];
   };
   maintenanceDuration: number;
 };
 
+// Affiche un label lisible pour l’enum
+function formatEquipmentStatusLabel(status: EquipmentStatus): string {
+  switch (status) {
+    case "DISPONIBLE":
+      return "Disponible";
+    case "INDISPONIBLE":
+      return "Indisponible";
+    case "EN_MAINTENANCE":
+      return "En maintenance";
+    default:
+      return "Inconnu";
+  }
+}
+
+// Donne une classe couleur selon le statut
+function getStatusColorClass(status: EquipmentStatus): string {
+  switch (status) {
+    case "DISPONIBLE":
+      return "text-green-600";
+    case "INDISPONIBLE":
+      return "text-red-600";
+    case "EN_MAINTENANCE":
+      return "text-yellow-600";
+    default:
+      return "text-gray-500";
+  }
+}
+
 export default function EquipmentDetailClient({
   equipmentData,
   maintenanceDuration,
 }: Props) {
+  const [incidents, setIncidents] = useState<IncidentReport[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+
   const latestHistory = equipmentData.histories?.[0];
   const isMaintenanceOverdue =
     latestHistory &&
     latestHistory.status.toLowerCase().includes("maintenance") &&
     new Date(latestHistory.date).getTime() + maintenanceDuration < Date.now();
+
+  const fetchIncidents = async () => {
+    const res = await fetch(`/api/equipment/${equipmentData.id}/incidents`);
+    const data = await res.json();
+    setIncidents(data);
+  };
+
+  // Chargement initial
+  useEffect(() => {
+    fetchIncidents();
+  }, []);
+  console.log("equipmentData.status:", equipmentData.status);
 
   return (
     <div className="p-4 flex flex-col gap-4 bg-gray-100 min-h-screen">
@@ -42,7 +91,12 @@ export default function EquipmentDetailClient({
 
       <ContentCardWrapper>
         <div className="flex items-center gap-2">
-          <p>{equipmentData.status}</p>
+          <Badge
+            variant="outline"
+            className={getStatusColorClass(equipmentData.status)}
+          >
+            {formatEquipmentStatusLabel(equipmentData.status)}
+          </Badge>
           {isMaintenanceOverdue && (
             <Badge variant="destructive">Maintenance dépassée</Badge>
           )}
@@ -82,7 +136,8 @@ export default function EquipmentDetailClient({
         </ContentCardWrapper>
 
         <ContentCardWrapper className="flex-1">
-          <p>yo</p>
+          <h2 className="text-lg font-bold">Incidents signalés</h2>
+          <IncidentList incidents={incidents} />
         </ContentCardWrapper>
       </div>
 
@@ -96,6 +151,8 @@ export default function EquipmentDetailClient({
         <ReportIncidentDialog
           open={isOpen}
           onOpenChange={setIsOpen}
+          equipmentId={equipmentData.id}
+          onIncidentReported={fetchIncidents}
         />
       )}
     </div>

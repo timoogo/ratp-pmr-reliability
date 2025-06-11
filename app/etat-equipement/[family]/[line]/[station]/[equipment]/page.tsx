@@ -10,6 +10,7 @@ export default async function EquipmentDetailPage({ params }: any) {
       histories: { orderBy: { date: "desc" } },
       checks: true,
       repairs: true,
+      incidents: { orderBy: { createdAt: "desc" } },
     },
   });
 
