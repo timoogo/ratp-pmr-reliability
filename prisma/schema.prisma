@@ -35,13 +35,46 @@ model Station {
 }
 
 model Equipment {
-  id          String         @id @default(cuid())
-  type        EquipmentType
-  status      String         // ex: "en service", "en panne"
-  code        String         @unique
-  stationId   String
-  station     Station        @relation(fields: [stationId], references: [id])
-  name        String
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  id              String             @id @default(cuid())
+  name            String
+  type            EquipmentType
+  status          String
+  code            String             @unique
+  stationId       String
+  station         Station            @relation(fields: [stationId], references: [id])
+  histories       EquipmentHistory[]
+  checks          EquipmentCheck[]
+  repairs         EquipmentRepair[]
+  displayHistory  Json               @default("{}") // <- ✅ AJOUTÉ ICI
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+}
+
+model EquipmentHistory {
+  id              String     @id @default(cuid())
+  equipmentId     String
+  equipment       Equipment  @relation(fields: [equipmentId], references: [id])
+  date            DateTime   // date de l’événement
+  status          String     // "ok", "ko", etc.
+  comment         String?
+  createdAt       DateTime   @default(now())
+}
+
+model EquipmentCheck {
+  id              String     @id @default(cuid())
+  equipmentId     String
+  equipment       Equipment  @relation(fields: [equipmentId], references: [id])
+  checkedAt       DateTime   // date de vérification
+  agent           String     // nom ou identifiant de l’agent
+  comment         String?
+  createdAt       DateTime   @default(now())
+}
+
+model EquipmentRepair {
+  id              String     @id @default(cuid())
+  equipmentId     String
+  equipment       Equipment  @relation(fields: [equipmentId], references: [id])
+  repairedAt      DateTime   // date de réparation effective
+  comment         String?
+  createdAt       DateTime   @default(now())
 }

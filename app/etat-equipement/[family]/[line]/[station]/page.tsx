@@ -4,7 +4,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 export default async function StationDetailPage({ params }: any) {
-  /* eslint-disable @typescript-eslint/no-unused-vars */
   const { family, line, station } = params;
 
   const stationData = await prisma.station.findUnique({
