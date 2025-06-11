@@ -28,6 +28,7 @@ model Station {
   line       String
   family     String
   equipments Equipment[] // 1 station -> N équipements
+  stationOrder      Int         @unique @map("order")
 
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt

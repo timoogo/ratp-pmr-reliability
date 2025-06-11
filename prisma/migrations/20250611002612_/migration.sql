@@ -9,6 +9,7 @@ CREATE TABLE "Station" (
     "slug" TEXT NOT NULL,
     "line" TEXT NOT NULL,
     "family" TEXT NOT NULL,
+    "order" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -34,6 +35,9 @@ CREATE UNIQUE INDEX "Station_code_key" ON "Station"("code");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Station_slug_key" ON "Station"("slug");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Station_order_key" ON "Station"("order");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Equipment_code_key" ON "Equipment"("code");

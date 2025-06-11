@@ -1,6 +1,7 @@
 import { Equipment } from "./elevator";
 
 export type Station = {
+  stationOrder: number;
   line: string;
   lineSymbol: "M" | "RER" | "T";
   name: string;

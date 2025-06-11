@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.mockStations = void 0;
 exports.mockStations = [
     {
+        stationOrder: 1,
         name: "Mairie de Saint-Ouen",
         slug: "mairie-de-saint-ouen",
         status: "ok",
@@ -15,6 +16,7 @@ exports.mockStations = [
         updatedAt: new Date(),
     },
     {
+        stationOrder: 2,
         name: "Saint-Ouen",
         slug: "saint-ouen",
         status: "ok",
@@ -27,6 +29,7 @@ exports.mockStations = [
         updatedAt: new Date(),
     },
     {
+        stationOrder: 3,
         name: "Porte de Clichy",
         slug: "porte-de-clichy",
         status: "ok",
@@ -39,6 +42,7 @@ exports.mockStations = [
         updatedAt: new Date(),
     },
     {
+        stationOrder: 4,
         name: "Pont Cardinet",
         slug: "pont-cardinet",
         status: "warning",
@@ -51,6 +55,7 @@ exports.mockStations = [
         updatedAt: new Date(),
     },
     {
+        stationOrder: 5,
         name: "Saint-Lazare",
         slug: "saint-lazare",
         status: "ok",
@@ -63,6 +68,7 @@ exports.mockStations = [
         updatedAt: new Date(),
     },
     {
+        stationOrder: 6,
         name: "Madeleine",
         slug: "madeleine",
         status: "current",
@@ -75,6 +81,7 @@ exports.mockStations = [
         updatedAt: new Date(),
     },
     {
+        stationOrder: 7,
         name: "Pyramides",
         slug: "pyramides",
         status: "ok",
@@ -87,6 +94,7 @@ exports.mockStations = [
         updatedAt: new Date(),
     },
     {
+        stationOrder: 8,
         name: "Châtelet",
         slug: "chatelet",
         status: "warning",
@@ -99,6 +107,7 @@ exports.mockStations = [
         updatedAt: new Date(),
     },
     {
+        stationOrder: 9,
         name: "Bercy",
         slug: "bercy",
         status: "ok",
@@ -111,6 +120,7 @@ exports.mockStations = [
         updatedAt: new Date(),
     },
     {
+        stationOrder: 10,
         name: "Cour Saint-Emilion",
         slug: "cour-saint-emilion",
         status: "ok",
@@ -123,6 +133,7 @@ exports.mockStations = [
         updatedAt: new Date(),
     },
     {
+        stationOrder: 11,
         name: "Bibliothèque François Mitterrand",
         slug: "bibliotheque-françois-mitterrand",
         status: "ok",
@@ -135,6 +146,7 @@ exports.mockStations = [
         updatedAt: new Date(),
     },
     {
+        stationOrder: 12,
         name: "Olympiades",
         slug: "olympiades",
         status: "ok",

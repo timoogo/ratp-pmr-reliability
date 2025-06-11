@@ -15,23 +15,32 @@ services:
       retries: 5
     networks:
       - ratp_network
+    volumes:
+      - pgdata:/var/lib/postgresql/data
 
   web:
     build:
       context: .
       dockerfile: Dockerfile
+      target: builder
       args:
         DATABASE_URL: postgres://postgres:postgres@db:5432/ratp_pmr
     environment:
       DATABASE_URL: postgres://postgres:postgres@db:5432/ratp_pmr
     ports:
       - "3000:3000"
-      - "5555:5555"
+      - "5555:5555" # si tu utilises Prisma Studio
+    volumes:
+      - .:/app
+    command: npm run dev
     depends_on:
       db:
         condition: service_healthy
     networks:
       - ratp_network
+
+volumes:
+  pgdata:
 
 networks:
   ratp_network:

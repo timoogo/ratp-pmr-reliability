@@ -13,12 +13,11 @@
     "studio": "DATABASE_URL='postgresql://postgres:postgres@localhost:5432/ratp_pmr' prisma studio",
     "build:seed": "tsc --project tsconfig.seed.json",
     "seed": "node dist/prisma/seed.js",
-
     "docker:seed": "docker exec -it ratp-pmr-reliability-web-1 node dist/prisma/seed.js"
   },
   "prisma": {
     "schema": "prisma/schema.prisma",
-    "seed": "node dist/seed.js"
+    "seed": "tsc --project tsconfig.seed.json && node dist/prisma/seed.js"
   },
   "dependencies": {
     "@prisma/client": "^6.9.0",

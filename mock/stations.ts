@@ -2,6 +2,7 @@ import { StationWithEquipments } from "../types/station.types";
 
 export const mockStations: StationWithEquipments[] = [
   {
+    stationOrder: 1,
     name: "Mairie de Saint-Ouen",
     slug: "mairie-de-saint-ouen",
     status: "ok",
@@ -14,6 +15,7 @@ export const mockStations: StationWithEquipments[] = [
     updatedAt: new Date(),
   },
   {
+    stationOrder: 2,
     name: "Saint-Ouen",
     slug: "saint-ouen",
     status: "ok",
@@ -26,6 +28,7 @@ export const mockStations: StationWithEquipments[] = [
     updatedAt: new Date(),
   },
   {
+    stationOrder: 3,
     name: "Porte de Clichy",
     slug: "porte-de-clichy",
     status: "ok",
@@ -38,6 +41,7 @@ export const mockStations: StationWithEquipments[] = [
     updatedAt: new Date(),
   },
   {
+    stationOrder: 4,
     name: "Pont Cardinet",
     slug: "pont-cardinet",
     status: "warning",
@@ -50,6 +54,7 @@ export const mockStations: StationWithEquipments[] = [
     updatedAt: new Date(),
   },
   {
+    stationOrder: 5,
     name: "Saint-Lazare",
     slug: "saint-lazare",
     status: "ok",
@@ -62,6 +67,7 @@ export const mockStations: StationWithEquipments[] = [
     updatedAt: new Date(),
   },
   {
+    stationOrder: 6,
     name: "Madeleine",
     slug: "madeleine",
     status: "current",
@@ -74,6 +80,7 @@ export const mockStations: StationWithEquipments[] = [
     updatedAt: new Date(),
   },
   {
+    stationOrder: 7,
     name: "Pyramides",
     slug: "pyramides",
     status: "ok",
@@ -86,6 +93,7 @@ export const mockStations: StationWithEquipments[] = [
     updatedAt: new Date(),
   },
   {
+    stationOrder: 8,
     name: "Châtelet",
     slug: "chatelet",
     status: "warning",
@@ -98,6 +106,7 @@ export const mockStations: StationWithEquipments[] = [
     updatedAt: new Date(),
   },
   {
+    stationOrder: 9,
     name: "Bercy",
     slug: "bercy",
     status: "ok",
@@ -110,6 +119,7 @@ export const mockStations: StationWithEquipments[] = [
     updatedAt: new Date(),
   },
   {
+    stationOrder: 10,
     name: "Cour Saint-Emilion",
     slug: "cour-saint-emilion",
     status: "ok",
@@ -122,6 +132,7 @@ export const mockStations: StationWithEquipments[] = [
     updatedAt: new Date(),
   },
   {
+    stationOrder: 11,
     name: "Bibliothèque François Mitterrand",
     slug: "bibliotheque-françois-mitterrand",
     status: "ok",
@@ -134,6 +145,7 @@ export const mockStations: StationWithEquipments[] = [
     updatedAt: new Date(),
   },
   {
+    stationOrder: 12,
     name: "Olympiades",
     slug: "olympiades",
     status: "ok",

@@ -5,7 +5,7 @@ import { ContentCardWrapper } from "@/components/ContentCardWrapper";
 import { Station } from "@/types/station";
 
 export default async function LineStatusPage({ params }: any) {
-  const { family, line } = params;
+  const { family, line, station } = params;
 
   const dbStations = await prisma.station.findMany({
     where: {
@@ -16,7 +16,7 @@ export default async function LineStatusPage({ params }: any) {
       equipments: true,
     },
     orderBy: {
-      name: "asc",
+      stationOrder: "asc",
     },
   });
 
@@ -28,6 +28,7 @@ export default async function LineStatusPage({ params }: any) {
     slug: s.name.toLowerCase().replace(/\s+/g, "-"),
     lineSymbol: "M",
     status: "ok",
+    stationOrder: s.stationOrder,
   }));
 
   return (
@@ -45,6 +46,7 @@ export default async function LineStatusPage({ params }: any) {
 
       <ContentCardWrapper>
         <StationStepper stations={stations} />
+        
       </ContentCardWrapper>
     </div>
   );

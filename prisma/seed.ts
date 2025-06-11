@@ -48,6 +48,7 @@
           slug: toSlug(station.name), // 🔥 FORCÉ à chaque fois
           line: station.line,
           family: station.family,
+          stationOrder: station.stationOrder,
           equipments: {
             create: Array.from({ length: Math.floor(Math.random() * 3) + 1 }).map((_, i) => ({
               type: "ASCENSEUR",
