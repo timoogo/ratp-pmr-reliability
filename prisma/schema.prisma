@@ -54,6 +54,8 @@ model Equipment {
   status          EquipmentStatus
   code            String             @unique
   stationId       String
+  situation       String             // ex : "Mezzanine vers Quai 1"
+  direction       String             // ex : "Olympiades"
   station         Station            @relation(fields: [stationId], references: [id])
   histories       EquipmentHistory[]
   checks          EquipmentCheck[]

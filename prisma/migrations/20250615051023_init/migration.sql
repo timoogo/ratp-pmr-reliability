@@ -30,6 +30,8 @@ CREATE TABLE "Equipment" (
     "status" "EquipmentStatus" NOT NULL,
     "code" TEXT NOT NULL,
     "stationId" TEXT NOT NULL,
+    "situation" TEXT NOT NULL,
+    "direction" TEXT NOT NULL,
     "displayHistory" JSONB NOT NULL DEFAULT '{}',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,

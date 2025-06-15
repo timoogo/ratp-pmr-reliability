@@ -1,13 +1,13 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
 type Props = {
@@ -23,6 +23,8 @@ export function ReportIncidentDialog({
   equipmentId,
   onIncidentReported,
 }: Props) {
+  console.log("Dialog open:", open);
+
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
 

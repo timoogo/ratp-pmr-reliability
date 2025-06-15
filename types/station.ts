@@ -13,3 +13,4 @@ export type Station = {
   createdAt: Date;
   updatedAt: Date;
 };
+

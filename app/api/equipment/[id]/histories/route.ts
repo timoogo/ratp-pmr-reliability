@@ -1,4 +1,4 @@
-// app/api/equipment/[id]/incidents/route.ts
+// app/api/equipment/[id]/histories/route.ts
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
@@ -8,15 +8,10 @@ export async function GET(
 ) {
   const { id } = params;
 
-  if (!id) {
-    return NextResponse.json({ error: "Missing equipment ID" }, { status: 400 });
-  }
-
-  const incidents = await prisma.incidentReport.findMany({
+  const histories = await prisma.equipmentHistory.findMany({
     where: { equipmentId: id },
     orderBy: { createdAt: "desc" },
-    take: 10,
   });
 
-  return NextResponse.json(incidents);
+  return NextResponse.json(histories);
 }

@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
 const stations_1 = require("../mock/stations");
+const equipments_1 = require("../mock/equipments");
 const prisma = new client_1.PrismaClient();
 const equipmentTypes = [
     "ASCENSEUR",
@@ -30,21 +31,26 @@ async function main() {
     await prisma.station.deleteMany();
     for (const station of stations_1.mockStations) {
         try {
+            const equipmentData = equipments_1.stationEquipmentsMap[station.name] ??
+                []; // ou fallback: Array.from({ length: 2 }, () => ({
+            //   situation: "Inconnue",
+            //   direction: "Inconnue",
+            // }));
             const createdStation = await prisma.station.create({
                 data: {
                     name: station.name,
                     code: station.code,
-                    slug: toSlug(station.name), // 🔥 FORCÉ à chaque fois
+                    slug: toSlug(station.name),
                     line: station.line,
                     family: station.family,
                     stationOrder: station.stationOrder,
                     equipments: {
-                        create: Array.from({
-                            length: Math.floor(Math.random() * 3) + 1,
-                        }).map((_, i) => ({
-                            type: "ASCENSEUR",
-                            status: random(Object.values(client_1.EquipmentStatus)), name: `Ascenseur ${i + 1}`,
+                        create: equipmentData.map((data, i) => ({
+                            name: `Ascenseur ${i + 1}`,
                             code: `ART_IDFM_${Math.floor(100000 + Math.random() * 900000)}`,
+                            type: "ASCENSEUR",
+                            status: random(Object.values(client_1.EquipmentStatus)),
+                            ...data,
                         })),
                     },
                 },
@@ -53,19 +59,15 @@ async function main() {
                 where: { stationId: createdStation.id },
             });
             for (const equipment of equipments) {
-                // Historique d'état - 10 entrées
                 for (let i = 0; i < 10; i++) {
                     await prisma.equipmentHistory.create({
                         data: {
                             equipmentId: equipment.id,
-                            date: new Date(Date.now() - 1000 * 60 * 60 * 24 * i), // i jours avant
+                            date: new Date(Date.now() - 1000 * 60 * 60 * 24 * i),
                             status: random(Object.values(client_1.EquipmentStatus)),
                             comment: `État #${i + 1} généré automatiquement.`,
                         },
                     });
-                }
-                // Vérification - 10 entrées
-                for (let i = 0; i < 10; i++) {
                     await prisma.equipmentCheck.create({
                         data: {
                             equipmentId: equipment.id,
@@ -74,10 +76,7 @@ async function main() {
                             comment: `Vérification #${i + 1} lors du seed.`,
                         },
                     });
-                }
-                // Réparation fictive si KO - 10 entrées si applicable
-                if (equipment.status !== "DISPONIBLE") {
-                    for (let i = 0; i < 10; i++) {
+                    if (equipment.status !== "DISPONIBLE") {
                         await prisma.equipmentRepair.create({
                             data: {
                                 equipmentId: equipment.id,
@@ -96,7 +95,6 @@ async function main() {
         }
     }
     console.log(`✅ Stations créées : ${stations_1.mockStations.length}`);
-    console.log(`✅ Équipements créés : ${stations_1.mockStations.length * 3}`);
 }
 main()
     .catch((e) => {

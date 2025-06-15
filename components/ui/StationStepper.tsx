@@ -4,12 +4,19 @@ import {
   StepperItem,
   StepperSeparator,
 } from "@/components/ui/stepper";
-import { Station } from "@/types/station";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 
-type StationStepperProps = {
-  stations: Station[];
+export type StationStepperProps = {
+  stations: {
+    name: string;
+    slug: string;
+    line: string;
+    family: "metro" | "rer" | "tramway" | "bus";
+    stationOrder: number;
+    lineSymbol: "M" | "RER" | "T" | "B";
+    status: "ok" | "warning" | "current";
+  }[];
 };
 
 export const StationStepper = ({ stations }: StationStepperProps) => {
