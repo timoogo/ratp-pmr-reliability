@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
+import { useTestWebSocket } from "@/hooks/useTestWebSocket";
+
+
 import "@/app/globals.css";
 
 import { Header } from "@/components/Header";
 import { SubHeader } from "@/components/SubHeader";
+import { WebSocketListener } from "@/WebSocketListener";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,14 +27,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="fr">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <Header />
         <SubHeader />
+        <WebSocketListener />
         <main>{children}</main>
         <Toaster />
       </body>

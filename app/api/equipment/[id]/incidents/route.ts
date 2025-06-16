@@ -1,11 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { id } = params;
+export async function GET(req: NextRequest) {
+  const url = new URL(req.url);
+  const parts = url.pathname.split("/");
+  const id = parts[parts.length - 2]; // car ta route est "/api/equipment/[id]/incidents"
+
   if (!id) {
     return NextResponse.json({ error: "Missing equipment ID" }, { status: 400 });
   }

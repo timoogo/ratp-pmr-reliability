@@ -30,11 +30,18 @@ reset-db:
 	sudo chown -R $(UID):$(GID) node_modules/.prisma || true
 	rm -rf prisma/migrations
 	rm -rf node_modules/.prisma
+
+	# 🚀 Démarre tous les services (inclut web, db, ws)
 	$(ENV_VARS) docker compose up -d
+
+	# 💾 Migration + génération Prisma
 	$(ENV_VARS) docker compose exec web npx prisma migrate dev --name init
 	$(ENV_VARS) docker compose exec web npx prisma generate
+
+	# 👤 Permissions build dist
 	$(ENV_VARS) sudo chown -R $(UID):$(GID) dist || true
 
+	# 🌱 Rebuild + seed DB
 	$(ENV_VARS) docker compose exec web npm run build:seed
 	$(ENV_VARS) docker compose exec web node dist/prisma/seed.js
 

@@ -19,26 +19,45 @@ services:
       - pgdata:/var/lib/postgresql/data
 
   web:
+    extra_hosts:
+      - "host.docker.internal:192.168.1.23"
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.web
       target: builder
       args:
         DATABASE_URL: postgres://postgres:postgres@db:5432/ratp_pmr
-    user: "${UID}:${GID}" # ✅ empêche les fichiers root
+    user: "${UID}:${GID}"
     environment:
       DATABASE_URL: postgres://postgres:postgres@db:5432/ratp_pmr
+      NEXT_PUBLIC_WS_URL: http://host.docker.internal:3001
     ports:
       - "3000:3000"
       - "5555:5555"
     volumes:
       - .:/app
-    command: sh -c "npm run dev || tail -f /dev/null" # ✅ reste up même si crash
+    command: sh -c "npm run dev || tail -f /dev/null"
     depends_on:
       db:
         condition: service_healthy
     networks:
       - ratp_network
+
+  ws:
+    build:
+      context: .
+      dockerfile: Dockerfile.ws
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./ws-server:/ws
+    command: npm run start
+    networks:
+      - ratp_network
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: always
 
 volumes:
   pgdata:

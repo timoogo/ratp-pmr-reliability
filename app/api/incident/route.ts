@@ -62,6 +62,18 @@ export async function POST(req: NextRequest) {
     },
   });
 
+  await fetch("http://ws:3001/notify", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      station: equipment.stationId, // ou autre champ pertinent
+      label: equipment.name,
+      equipmentId: equipment.id,
+      status: equipment.status,
+    }),
+  });
+  
+
   return NextResponse.json(
     {
       incident: report,
