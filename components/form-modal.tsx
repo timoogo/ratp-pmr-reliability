@@ -19,6 +19,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toast } from "sonner";
+
+
+
+
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -52,7 +57,10 @@ export function ReportIncidentDialog({
         body: JSON.stringify({ description, equipmentId }),
       });
 
-      if (!res.ok) throw new Error("Erreur lors de l'envoi du signalement");
+      if (!res.ok) {
+        toast.error("Erreur lors de l'envoi du signalement");
+        throw new Error("Erreur lors de l'envoi du signalement");
+      }
 
       const newIncident = await res.json();
 
@@ -75,6 +83,11 @@ export function ReportIncidentDialog({
 
       setDescription("");
       onOpenChange(false);
+      toast.success("Signalement envoyé avec succès", {
+        description: "Votre signalement a bien été pris en compte",
+        duration: 5000,
+
+      });
     } catch (error) {
       console.error(error);
       alert("Une erreur est survenue");
