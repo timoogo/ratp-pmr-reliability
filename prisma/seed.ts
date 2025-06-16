@@ -117,6 +117,7 @@
                 date,
                 status: history[i],
                 comment: `État #${i + 1} généré automatiquement.`,
+                pending: false,
               },
             });
   

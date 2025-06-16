@@ -33,6 +33,7 @@ export default async function EquipmentDetailPage({ params }: any) {
       checks: true,
       repairs: true,
       incidents: { orderBy: { createdAt: "desc" } },
+      
     },
   });
 

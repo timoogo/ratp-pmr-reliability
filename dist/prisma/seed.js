@@ -100,6 +100,7 @@ async function main() {
                             date,
                             status: history[i],
                             comment: `État #${i + 1} généré automatiquement.`,
+                            pending: false,
                         },
                     });
                     await prisma.equipmentCheck.create({

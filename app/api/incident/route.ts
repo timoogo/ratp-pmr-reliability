@@ -31,7 +31,9 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // 🛠️ Met à jour le statut si l'équipement est actuellement marqué comme disponible
+  let createdHistory = null;
+
+  // 🛠️ Si l'équipement est DISPONIBLE, on le passe en INDISPONIBLE + on crée un historique
   if (equipment.status === EquipmentStatus.DISPONIBLE) {
     await prisma.equipment.update({
       where: { id: equipment.id },
@@ -40,8 +42,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // 🧾 Ajoute une ligne dans l'historique
-    await prisma.equipmentHistory.create({
+    createdHistory = await prisma.equipmentHistory.create({
       data: {
         equipmentId: equipment.id,
         status: EquipmentStatus.INDISPONIBLE,
@@ -49,14 +50,6 @@ export async function POST(req: NextRequest) {
         date: new Date(),
       },
     });
-    await prisma.equipmentHistory.create({
-      data: {
-        equipmentId: equipment.id,
-        status: EquipmentStatus.INDISPONIBLE,
-        comment: "Statut mis à jour automatiquement suite à un signalement",
-        date: new Date(),
-      },
-    }); 
   }
 
   // ✅ Enregistre le signalement
@@ -69,7 +62,11 @@ export async function POST(req: NextRequest) {
     },
   });
 
-
-
-  return NextResponse.json(report, { status: 201 });
+  return NextResponse.json(
+    {
+      incident: report,
+      history: createdHistory, // peut être `null` si pas de mise à jour
+    },
+    { status: 201 }
+  );
 }

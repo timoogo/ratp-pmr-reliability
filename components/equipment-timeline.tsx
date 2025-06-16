@@ -11,6 +11,7 @@ import { AlertTriangle, CheckCircle, Wrench } from "lucide-react";
 
 type Props = {
   histories: FrontendEquipmentHistory[];
+  onValidate?: (id: string) => void;
 };
 
 type EquipmentHistory = FrontendEquipmentHistory;
@@ -148,8 +149,28 @@ function formatDateTime(dateString: string) {
   };
 }
 
-export function EquipmentTimeline({ histories }: Props) {
+
+
+
+
+export function EquipmentTimeline({ histories, onValidate }: Props) {
   const grouped = groupAndSortHistories(histories);
+
+  const handleValidatePending = async (item: EquipmentHistory) => {
+    try {
+      const res = await fetch(`/api/incident/${item.id}/validate`, {
+        method: "POST",
+      });
+  
+      if (!res.ok) throw new Error("Erreur lors de la validation");
+  
+      onValidate?.(item.id); // ici, déclenche la MAJ locale
+    } catch (e) {
+      console.error(e);
+      alert("La validation a échoué");
+    }
+  };
+
 
   if (!histories.length) {
     return (
@@ -243,7 +264,7 @@ export function EquipmentTimeline({ histories }: Props) {
                       <>
                         {group.count > 1 && (
                           <Badge variant="secondary" className="text-xs">
-                            Signalé {group.count} fois
+                            {group.status === EquipmentStatus.DISPONIBLE ? "Réparé" : `Signalé ${group.count} fois`}
                           </Badge>
                         )}
                         {index === 0 && (
@@ -256,11 +277,13 @@ export function EquipmentTimeline({ histories }: Props) {
                         )}
                         {isPending && (
                           <Badge
-                            variant="outline"
-                            className="text-gray-500 border-gray-300 bg-white"
-                          >
-                            À valider
-                          </Badge>
+                          variant="outline"
+                          className="text-gray-500 border-gray-300 bg-white cursor-pointer hover:bg-gray-100"
+                          onClick={() => handleValidatePending(group.items[0])}
+                        >
+                          À valider
+                        </Badge>
+                        
                         )}
                       </>
                     }

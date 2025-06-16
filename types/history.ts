@@ -1,3 +1,5 @@
+import { EquipmentHistory, IncidentReport } from "@prisma/client";
+import { Equipment } from "@prisma/client";
 export type FrontendEquipmentHistory = {
     id: string;
     status: string; // ✅ string, car le backend renvoie une string
@@ -6,3 +8,8 @@ export type FrontendEquipmentHistory = {
     pending?: boolean;
   };
   
+  export type IncidentWithEquipmentAndHistories = IncidentReport & {
+    equipment: Equipment & {
+      histories: EquipmentHistory[];
+    };
+  };

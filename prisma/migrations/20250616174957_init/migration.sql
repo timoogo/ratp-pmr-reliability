@@ -47,6 +47,7 @@ CREATE TABLE "EquipmentHistory" (
     "status" TEXT NOT NULL,
     "comment" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "pending" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "EquipmentHistory_pkey" PRIMARY KEY ("id")
 );

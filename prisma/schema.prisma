@@ -74,6 +74,7 @@ model EquipmentHistory {
   status          String     // "ok", "ko", etc.
   comment         String?
   createdAt       DateTime   @default(now())
+  pending         Boolean    @default(true)
 }
 
 model EquipmentCheck {
