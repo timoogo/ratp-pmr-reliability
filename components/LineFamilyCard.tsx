@@ -45,7 +45,7 @@ export const LineFamilyCard = ({ family, lines }: LineFamilyCardProps) => {
               {img}
             </Link>
           ) : (
-            <div key={line.code}>{img}</div>
+            <div className="border-2 border-gray-300 rounded-full p-1" key={line.code}>{img}</div>
           );
         })}
       </div>

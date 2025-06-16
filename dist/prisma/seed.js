@@ -10,6 +10,24 @@ const equipmentTypes = [
     "PORTILLONS",
     "CABINES",
 ];
+function generateStatusHistory(current, length = 10) {
+    const history = [current];
+    while (history.length < length) {
+        const prev = history[0];
+        switch (prev) {
+            case "DISPONIBLE":
+                history.unshift("EN_MAINTENANCE");
+                break;
+            case "EN_MAINTENANCE":
+                history.unshift("INDISPONIBLE");
+                break;
+            case "INDISPONIBLE":
+                history.unshift(Math.random() > 0.5 ? "INDISPONIBLE" : "EN_MAINTENANCE");
+                break;
+        }
+    }
+    return history;
+}
 function random(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
 }
@@ -31,11 +49,7 @@ async function main() {
     await prisma.station.deleteMany();
     for (const station of stations_1.mockStations) {
         try {
-            const equipmentData = equipments_1.stationEquipmentsMap[station.name] ??
-                []; // ou fallback: Array.from({ length: 2 }, () => ({
-            //   situation: "Inconnue",
-            //   direction: "Inconnue",
-            // }));
+            const equipmentData = equipments_1.stationEquipmentsMap[station.name] ?? [];
             const createdStation = await prisma.station.create({
                 data: {
                     name: station.name,
@@ -45,13 +59,31 @@ async function main() {
                     family: station.family,
                     stationOrder: station.stationOrder,
                     equipments: {
-                        create: equipmentData.map((data, i) => ({
-                            name: `Ascenseur ${i + 1}`,
-                            code: `ART_IDFM_${Math.floor(100000 + Math.random() * 900000)}`,
-                            type: "ASCENSEUR",
-                            status: random(Object.values(client_1.EquipmentStatus)),
-                            ...data,
-                        })),
+                        create: [
+                            ...equipmentData.map((data, i) => ({
+                                name: `Ascenseur ${i + 1}`,
+                                code: `ART_IDFM_${Math.floor(100000 + Math.random() * 900000)}`,
+                                type: client_1.EquipmentType.ASCENSEUR,
+                                status: random(Object.values(client_1.EquipmentStatus)),
+                                ...data,
+                            })),
+                            {
+                                name: "Escalator",
+                                code: `ART_IDFM_${Math.floor(100000 + Math.random() * 900000)}`,
+                                type: client_1.EquipmentType.ESCALATOR,
+                                status: random(Object.values(client_1.EquipmentStatus)),
+                                situation: "Hall principal",
+                                direction: "Vers sortie",
+                            },
+                            ...Array.from({ length: 4 }, (_, j) => ({
+                                name: `Portillon ${j + 1}`,
+                                code: `ART_IDFM_${Math.floor(100000 + Math.random() * 900000)}`,
+                                type: client_1.EquipmentType.PORTILLONS,
+                                status: random(Object.values(client_1.EquipmentStatus)),
+                                situation: "Zone d'accès",
+                                direction: "Entrée",
+                            })),
+                        ],
                     },
                 },
             });
@@ -59,36 +91,44 @@ async function main() {
                 where: { stationId: createdStation.id },
             });
             for (const equipment of equipments) {
-                for (let i = 0; i < 10; i++) {
+                const history = generateStatusHistory(equipment.status, 10); // le dernier = statut actuel
+                for (let i = 0; i < history.length; i++) {
+                    const date = new Date(Date.now() - 1000 * 60 * 60 * 24 * (history.length - 1 - i));
                     await prisma.equipmentHistory.create({
                         data: {
                             equipmentId: equipment.id,
-                            date: new Date(Date.now() - 1000 * 60 * 60 * 24 * i),
-                            status: random(Object.values(client_1.EquipmentStatus)),
+                            date,
+                            status: history[i],
                             comment: `État #${i + 1} généré automatiquement.`,
                         },
                     });
                     await prisma.equipmentCheck.create({
                         data: {
                             equipmentId: equipment.id,
-                            checkedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * i),
+                            checkedAt: date,
                             agent: "AgentSeedBot",
                             comment: `Vérification #${i + 1} lors du seed.`,
                         },
                     });
-                    if (equipment.status !== "DISPONIBLE") {
+                    if (history[i] !== "DISPONIBLE") {
                         await prisma.equipmentRepair.create({
                             data: {
                                 equipmentId: equipment.id,
-                                repairedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * i),
+                                repairedAt: date,
                                 comment: `Réparation #${i + 1} simulée après panne.`,
                             },
                         });
                     }
                 }
+                const historiesCount = await prisma.equipmentHistory.count({
+                    where: { equipmentId: equipment.id },
+                });
+                const repairsCount = await prisma.equipmentRepair.count({
+                    where: { equipmentId: equipment.id },
+                });
+                console.log(`🔧 Historique généré pour ${equipment.name}: ${historiesCount} entrées`);
+                console.log(`🛠️ Réparations simulées pour ${equipment.name}: ${repairsCount} entrées`);
             }
-            console.log(`✅ Station créée : ${createdStation.name}`);
-            console.log(`✅ Équipements créés : ${equipments.length}`);
         }
         catch (e) {
             console.error(`❌ Erreur sur la station ${station.name} (${station.code}):`, e);

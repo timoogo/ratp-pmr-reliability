@@ -1,12 +1,12 @@
-// app/api/equipment/[id]/histories/route.ts
 import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
+
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
-  _req: Request,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  context: any
 ) {
-  const { id } = params;
+  const { id } = context.params;
 
   const histories = await prisma.equipmentHistory.findMany({
     where: { equipmentId: id },

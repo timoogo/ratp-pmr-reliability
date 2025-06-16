@@ -1,11 +1,11 @@
-// app/etat-equipement/[family]/[line]/[station]/page.tsx
-import { notFound } from "next/navigation";
+import { ContentCardWrapper } from "@/components/ContentCardWrapper";
 import { prisma } from "@/lib/prisma";
-import { StationHeader } from "@/components/station/StationHeader";
-import { StationInfoCard } from "@/components/station/StationInfoCard";
+import { formatFromOptions } from "@/lib/utils";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 
 export default async function StationDetailPage({ params }: any) {
-  const { family, line, station } = params;
+  const { station } = params;
 
   const stationData = await prisma.station.findUnique({
     where: { slug: station },
@@ -14,15 +14,31 @@ export default async function StationDetailPage({ params }: any) {
 
   if (!stationData) return notFound();
 
+  const types = [...new Set(stationData.equipments.map((e) => e.type))];
+
   return (
-    <div className="p-6 flex flex-col gap-6 bg-gray-100 min-h-screen">
-      <StationHeader line={stationData.line} name={stationData.name} />
-      <StationInfoCard
-        name={stationData.name}
-        line={stationData.line}
-        family={stationData.family}
-        equipments={stationData.equipments}
-      />
-    </div>
+    <>
+      {types.map((type) => {
+        const { label } = formatFromOptions(type, {
+          plural: true,
+          lowercase: true,
+        });
+
+        return (
+          <ContentCardWrapper
+            key={type}
+            className="h-12 flex bg-white mt-16 mx-4 items-center justify-between px-6 py-4 border-b"
+          >
+            
+            <Link
+              href={`/etat-equipement/${stationData.family}/${stationData.line}/${stationData.slug}/${label}`}
+              className="text-sm font-medium text-blue-600 hover:underline"
+            >
+              Voir l'état des {label}
+            </Link>
+          </ContentCardWrapper>
+        );
+      })}
+    </>
   );
 }

@@ -9,11 +9,13 @@ export const StationInfoCard = ({
   line,
   family,
   equipments,
+  type,
 }: {
   name: string;
   line: string;
   family: string;
   equipments: Equipment[];
+  type: string;
 }) => {
   const lineColor = "bg-purple-700";
 
@@ -53,6 +55,7 @@ export const StationInfoCard = ({
           family={family}
           line={line}
           station={name}
+          type={type}
         />
       ))}
     </ContentCardWrapper>

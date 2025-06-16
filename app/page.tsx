@@ -6,7 +6,7 @@ export default function HomePage() {
       <section className="space-y-4">
         <h1 className="text-3xl font-bold">Accessibilité et fiabilité des équipements PMR</h1>
         <p className="text-muted-foreground">
-          Bienvenue sur la plateforme de suivi de l’état des équipements destinés aux personnes à mobilité réduite (PMR) dans les stations de transport de la RATP.
+          Bienvenue sur la plateforme de suivi de l&apos; état des équipements destinés aux personnes à mobilité réduite (PMR) dans les stations de transport de la RATP.
         </p>
         <Link href="/etat-equipement">Voir l'état des équipements</Link>
       </section>

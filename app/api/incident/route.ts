@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { EquipmentStatus } from "@prisma/client";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -18,6 +19,47 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // 🔍 Récupère l'équipement concerné
+  const equipment = await prisma.equipment.findUnique({
+    where: { id: body.equipmentId },
+  });
+
+  if (!equipment) {
+    return NextResponse.json(
+      { error: "Équipement non trouvé" },
+      { status: 404 }
+    );
+  }
+
+  // 🛠️ Met à jour le statut si l'équipement est actuellement marqué comme disponible
+  if (equipment.status === EquipmentStatus.DISPONIBLE) {
+    await prisma.equipment.update({
+      where: { id: equipment.id },
+      data: {
+        status: EquipmentStatus.INDISPONIBLE,
+      },
+    });
+
+    // 🧾 Ajoute une ligne dans l'historique
+    await prisma.equipmentHistory.create({
+      data: {
+        equipmentId: equipment.id,
+        status: EquipmentStatus.INDISPONIBLE,
+        comment: "Statut mis à jour automatiquement suite à un signalement",
+        date: new Date(),
+      },
+    });
+    await prisma.equipmentHistory.create({
+      data: {
+        equipmentId: equipment.id,
+        status: EquipmentStatus.INDISPONIBLE,
+        comment: "Statut mis à jour automatiquement suite à un signalement",
+        date: new Date(),
+      },
+    }); 
+  }
+
+  // ✅ Enregistre le signalement
   const report = await prisma.incidentReport.create({
     data: {
       description: body.description,
@@ -26,6 +68,8 @@ export async function POST(req: NextRequest) {
       userAgent,
     },
   });
+
+
 
   return NextResponse.json(report, { status: 201 });
 }

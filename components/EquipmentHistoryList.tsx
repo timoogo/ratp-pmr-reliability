@@ -134,7 +134,9 @@ export function EquipmentHistoryList({ equipmentId }: Props) {
               <div className="flex items-center gap-2">
                 {getStatusIcon(item.status)}
                 <span className="font-medium">{formatStatus(item.status)}</span>
-                {item.count > 1 && (
+
+                {/* Badge affiché uniquement pour le groupe le plus récent (index === 0) */}
+                {index === 0 && item.count > 1 && (
                   <Badge variant="secondary" title="Voir les détails">
                     Signalé {item.count} fois
                   </Badge>
@@ -146,8 +148,8 @@ export function EquipmentHistoryList({ equipmentId }: Props) {
               </div>
             )}
             renderDetails={(item) => (
-              <ul className="space-y-2">
-                {item.items.map((h, i) => (
+              <ul className="space-y-2 text-sm">
+                {item.items.map((h) => (
                   <li key={h.id}>
                     <p>
                       <strong>{formatStatus(h.status)}</strong> —{" "}

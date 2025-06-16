@@ -25,14 +25,15 @@ services:
       target: builder
       args:
         DATABASE_URL: postgres://postgres:postgres@db:5432/ratp_pmr
+    user: "${UID}:${GID}" # ✅ empêche les fichiers root
     environment:
       DATABASE_URL: postgres://postgres:postgres@db:5432/ratp_pmr
     ports:
       - "3000:3000"
-      - "5555:5555" # si tu utilises Prisma Studio
+      - "5555:5555"
     volumes:
       - .:/app
-    command: npm run dev
+    command: sh -c "npm run dev || tail -f /dev/null" # ✅ reste up même si crash
     depends_on:
       db:
         condition: service_healthy

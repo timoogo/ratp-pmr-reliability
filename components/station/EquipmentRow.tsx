@@ -1,6 +1,6 @@
 // components/station/EquipmentRow.tsx
-import { CheckCircle, AlertTriangle, XCircle } from "lucide-react";
 import { EquipmentStatus } from "@prisma/client";
+import { AlertTriangle, CheckCircle, XCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -12,6 +12,7 @@ type Props = {
   line: string;
   station: string;
   code: string;
+  type: string;
 };
 
 
@@ -21,7 +22,7 @@ const bgColor: Record<EquipmentStatus, string> = {
   [EquipmentStatus.EN_MAINTENANCE]: "hover:bg-yellow-600/10",
 }
 
-export const EquipmentRow = ({ situation, direction, status, family, line, station, code }: Props) => {
+export const EquipmentRow = ({ situation, direction, status, family, line, station, code, type   }: Props) => {
   const renderStatus = () => {
     switch (status) {
       case EquipmentStatus.DISPONIBLE:
@@ -48,8 +49,10 @@ export const EquipmentRow = ({ situation, direction, status, family, line, stati
     }
   };
 
+  type = type.toLowerCase();
+  station = station.toLowerCase();
   return (
-    <Link href={`/etat-equipement/${family}/${line}/${station}/${code}`}>
+    <Link href={`/etat-equipement/${family}/${line}/${station}/${type}/${code}`}>
     <div className={`grid grid-cols-12 gap-4 items-center px-6 py-4 border-t text-sm ${bgColor[status as EquipmentStatus]}`}>
       <div className="col-span-2">
         <div className="w-10 h-10 bg-blue-600/10 rounded grid place-content-center">

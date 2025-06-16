@@ -1,4 +1,6 @@
+// File: /components/ui/StationStepper.tsx
 import { StationRow } from "@/components/StationRow";
+import { EquipmentType } from "@prisma/client";
 import {
   Stepper,
   StepperItem,
@@ -6,6 +8,19 @@ import {
 } from "@/components/ui/stepper";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
+
+function getEquipmentType(type: keyof typeof EquipmentType) {
+  switch (type) {
+    case "ASCENSEUR":
+      return "ascenseurs";
+    case "ESCALATOR":
+      return "escalators";
+    case "PORTILLONS":
+      return "portillons";
+    case "CABINES":
+      return "cabinets";
+  }
+}
 
 export type StationStepperProps = {
   stations: {
@@ -16,6 +31,7 @@ export type StationStepperProps = {
     stationOrder: number;
     lineSymbol: "M" | "RER" | "T" | "B";
     status: "ok" | "warning" | "current";
+    type: EquipmentType;
   }[];
 };
 
@@ -25,7 +41,7 @@ export const StationStepper = ({ stations }: StationStepperProps) => {
       {stations.map((station, index) => (
         <StepperItem key={station.slug} step={index} className="relative">
           <Link
-            href={`/etat-equipement/${station.family}/${station.line}/${station.slug}`}
+            href={`/etat-equipement/${station.family}/${station.line}/${station.slug}/${getEquipmentType(station.type)}`}
             className="flex w-full items-center no-underline"
           >
             <StationRow name={station.name} status={station.status} />

@@ -8,6 +8,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { EquipmentHistoryWithPending } from "@/types/equipement";
+import { EquipmentStatus } from "@prisma/client";
 import { useState } from "react";
 
 type Props = {
@@ -15,6 +17,7 @@ type Props = {
   onOpenChange: (open: boolean) => void;
   equipmentId: string;
   onIncidentReported: () => void;
+  onIncidentAdded?: (item: EquipmentHistoryWithPending) => void;
 };
 
 export function ReportIncidentDialog({
@@ -22,6 +25,7 @@ export function ReportIncidentDialog({
   onOpenChange,
   equipmentId,
   onIncidentReported,
+  onIncidentAdded,
 }: Props) {
   console.log("Dialog open:", open);
 
@@ -44,6 +48,18 @@ export function ReportIncidentDialog({
       onOpenChange(false);
       setDescription("");
       onIncidentReported();
+
+      const newIncident: EquipmentHistoryWithPending = {
+        id: crypto.randomUUID(),
+        status: EquipmentStatus.INDISPONIBLE, // ou renvoyé par l’API
+        comment: description,
+        createdAt: new Date(),
+        equipmentId: equipmentId,
+        date: new Date(),
+        pending: true,
+      };
+
+      onIncidentAdded?.(newIncident);
     } catch (err) {
       console.error(err);
       alert("Erreur lors de l’envoi du signalement");
