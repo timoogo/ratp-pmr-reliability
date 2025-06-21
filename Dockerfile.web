@@ -41,6 +41,7 @@
     COPY --from=builder /app/types ./types
     COPY --from=builder /app/prisma ./prisma
     COPY --from=builder /app/tsconfig.seed.json ./tsconfig.seed.json
+    COPY --from=builder /app/generate-vapid.ts ./generate-vapid.ts
     
     # Ajout du script de démarrage
     COPY ./start.sh ./start.sh

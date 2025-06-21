@@ -1,34 +1,38 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { EquipmentType } from "@prisma/client";
-
-type Frequency = "IMMEDIATE" | "DAILY" | "WEEKLY";
+import { EquipmentType, SubscriptionFrequency } from "@prisma/client";
+import { toast } from "sonner";
 
 type StationSubscriptionFormProps = {
   stationSlug: string;
   availableTypes: EquipmentType[];
-  onSubmit: (data: { types: string[]; frequency: Frequency }) => void;
+  initialTypes: string[];
+  initialFrequency: keyof typeof SubscriptionFrequency;
+  onSubmit: (data: { types: string[]; frequency: SubscriptionFrequency }) => void;
 };
 
 export function StationSubscriptionForm({
   stationSlug,
   availableTypes,
+  initialTypes,
+  initialFrequency,
   onSubmit,
 }: StationSubscriptionFormProps) {
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([...availableTypes]);
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [frequency, setFrequency] = useState<SubscriptionFrequency>("IMMEDIATE");
 
-  const [frequency, setFrequency] = useState<Frequency>("IMMEDIATE");
+  // Synchroniser les états avec les props initiales à chaque changement
+  useEffect(() => {
+    setSelectedTypes(initialTypes);
+  }, [initialTypes]);
+
+  useEffect(() => {
+    setFrequency(initialFrequency);
+  }, [initialFrequency]);
 
   const toggleType = (type: string) => {
     setSelectedTypes((prev) =>
@@ -36,11 +40,18 @@ export function StationSubscriptionForm({
     );
   };
 
-  const handleSubmit = () => {
-    onSubmit({
-      types: selectedTypes,
-      frequency: frequency,
-    });
+  const handleSubmit = async () => {
+    if (selectedTypes.length === 0) {
+      toast.error("Merci de sélectionner au moins un type d’équipement");
+      return;
+    }
+    try {
+      await onSubmit({ types: selectedTypes, frequency });
+      toast.success("Abonnement enregistré avec succès");
+    } catch (err) {
+      toast.error("Erreur lors de l'enregistrement de l'abonnement");
+      console.error(err);
+    }
   };
 
   return (
@@ -64,11 +75,15 @@ export function StationSubscriptionForm({
 
       <div className="pt-2">
         <Label className="text-sm mb-1 block">Fréquence</Label>
-         <select value={frequency} onChange={(e) => setFrequency(e.target.value as "IMMEDIATE" | "DAILY" | "WEEKLY")}>
-            <option value="IMMEDIATE">Immédiat</option>
-            <option value="DAILY">Quotidien</option>
-            <option value="WEEKLY">Hebdomadaire</option>
-            </select>
+        <select
+          value={frequency}
+          onChange={(e) => setFrequency(e.target.value as SubscriptionFrequency)}
+          className="w-full max-w-xs"
+        >
+          <option value="IMMEDIATE">Immédiat</option>
+          <option value="DAILY">Quotidien</option>
+          <option value="WEEKLY">Hebdomadaire</option>
+        </select>
       </div>
 
       <Button className="mt-2" onClick={handleSubmit}>

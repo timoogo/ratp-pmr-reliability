@@ -11,9 +11,10 @@ import {
   getStationStatus,
   getSummaryByType,
 } from "@/utils/helpers";
+import { onSubscribe } from "@/utils/onSubscribe";
 import { socket } from "@/utils/socket";
-import { EquipmentType } from "@prisma/client";
-import { useCallback, useEffect, useState } from "react";
+import { EquipmentType, SubscriptionFrequency } from "@prisma/client";
+import { useEffect, useRef, useState } from "react";
 import { StationHeader } from "./StationHeader";
 import { StationSubscriptionForm } from "./StationSubscriptionForm";
 import { StationSummaryCard } from "./StationSummaryCard";
@@ -38,28 +39,38 @@ export function StationStepperWithAccordion({
 }: StationStepperWithAccordionProps) {
   const [stations, setStations] = useState(initialStations);
   const [lastUpdates, setLastUpdates] = useState<Record<string, string>>({});
+  const [subscriptions, setSubscriptions] = useState<
+    Record<
+      string,
+      { types: string[]; frequency: keyof typeof SubscriptionFrequency }
+    >
+  >({});
 
-  const handleSubscriptionSubmit = useCallback(
-    (data: {
-      types: string[];
-      frequency: "IMMEDIATE" | "DAILY" | "WEEKLY";
-    }) => {
-      // logique future ici
-    },
-    []
-  );
+  const prevLastUpdates = useRef<Record<string, string>>({});
 
-  // 🔁 Reset lastUpdates quand stations changent (ex : re-fetch)
+  // Init lastUpdates uniquement si nécessaire (évite boucle infinie)
   useEffect(() => {
-    const initialLastUpdates: Record<string, string> = {};
+    const next: Record<string, string> = {};
+    let changed = false;
+
     for (const station of stations) {
-      const updatedAt = new Date(getLastUpdate(station.equipments)).toISOString();
-      initialLastUpdates[station.slug] = updatedAt;
+      const updatedAt = new Date(
+        getLastUpdate(station.equipments)
+      ).toISOString();
+      next[station.slug] = updatedAt;
+
+      if (prevLastUpdates.current[station.slug] !== updatedAt) {
+        changed = true;
+      }
     }
-    setLastUpdates(initialLastUpdates);
+
+    if (changed) {
+      setLastUpdates(next);
+      prevLastUpdates.current = next;
+    }
   }, [stations]);
 
-  // 🎯 Mise à jour via socket
+  // Mise à jour via WebSocket (évite boucle infinie)
   useEffect(() => {
     const handler = (data: {
       station: string;
@@ -69,7 +80,7 @@ export function StationStepperWithAccordion({
       setStations((prev) =>
         prev.map((station) => {
           if (station.name !== data.station) return station;
-  
+
           return {
             ...station,
             equipments: station.equipments.map((eq) =>
@@ -85,14 +96,32 @@ export function StationStepperWithAccordion({
         })
       );
     };
-  
+
     socket.on("equipment-status-updated", handler);
-  
     return () => {
       socket.off("equipment-status-updated", handler);
     };
   }, []);
   
+
+
+  useEffect(() => {
+    async function fetchSubscriptions() {
+      try {
+        const res = await fetch("/api/push-subscriptions");
+        if (!res.ok) throw new Error("Erreur réseau");
+        const data = await res.json();
+        const map = data.reduce((acc: Record<string, { types: string[]; frequency: keyof typeof SubscriptionFrequency }>, sub: { station: string; types: string[]; frequency: keyof typeof SubscriptionFrequency }) => {
+          acc[sub.station] = { types: sub.types, frequency: sub.frequency };
+          return acc;
+        }, {} as Record<string, { types: string[]; frequency: keyof typeof SubscriptionFrequency }>);
+        setSubscriptions(map);
+      } catch (error) {
+        console.error("Erreur lors du chargement des abonnements :", error);
+      }
+    }
+    fetchSubscriptions();
+  }, []);
 
   return (
     <Accordion type="multiple" className="w-full space-y-2">
@@ -103,7 +132,11 @@ export function StationStepperWithAccordion({
         ).length;
         const globalStatus = getStationStatus(station.equipments);
         const summaryByType = getSummaryByType(station.equipments);
-        const lastUpdate = new Date(getLastUpdate(station.equipments)).toISOString();
+        const lastUpdate = new Date(
+          getLastUpdate(station.equipments)
+        ).toISOString();
+
+        const availableTypes = Object.keys(summaryByType) as EquipmentType[];
 
         return (
           <AccordionItem key={station.slug} value={station.slug}>
@@ -129,8 +162,31 @@ export function StationStepperWithAccordion({
               />
               <StationSubscriptionForm
                 stationSlug={station.slug}
-                availableTypes={Object.keys(summaryByType) as EquipmentType[]}
-                onSubmit={handleSubscriptionSubmit}
+                availableTypes={availableTypes}
+                initialTypes={subscriptions[station.slug]?.types || []}
+                initialFrequency={
+                  subscriptions[station.slug]?.frequency || "IMMEDIATE"
+                }
+                onSubmit={async (data) => {
+                  try {
+                    await onSubscribe({
+                      stationSlug: station.slug,
+                      selectedTypes: data.types,
+                      frequency: data.frequency,
+                    });
+                    setSubscriptions((prev) => ({
+                      ...prev,
+                      [station.slug]: {
+                        types: data.types,
+                        frequency: data.frequency,
+                      },
+                    }));
+                  } catch (error) {
+                    console.error(error);
+                    // Toast ou feedback d'erreur possible
+                  }
+                }}
+                
               />
             </AccordionContent>
           </AccordionItem>

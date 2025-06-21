@@ -45,6 +45,9 @@ reset-db:
 	$(ENV_VARS) docker compose exec web npm run build:seed
 	$(ENV_VARS) docker compose exec web node dist/prisma/seed.js
 
+	# ✅ Prisma studio
+	$(ENV_VARS) docker compose exec web npx prisma studio
+
 reseed:
 	$(ENV_VARS) docker compose exec web npm run build:seed
 	$(ENV_VARS) docker compose exec web node dist/prisma/seed.js
@@ -59,3 +62,21 @@ prune:
 	-docker container prune -f
 	-docker volume prune -f
 	-docker network prune -f
+
+
+.PHONY: prisma-validate prisma-migrate
+
+# ✅ Valider le schéma
+prisma-validate:
+	npx prisma validate
+
+# ✅ Appliquer les migrations (dev)
+prisma-migrate:
+	docker compose up -d db
+	sleep 3 # laisse le temps à la BDD de démarrer
+	npx prisma validate
+	npx prisma migrate dev --name subscription-schema
+
+
+# ✅ Enchaîner les deux
+prisma-setup: prisma-validate prisma-migrate
