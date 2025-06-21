@@ -59,6 +59,7 @@ export function ReportIncidentDialog({
 
       if (!res.ok) {
         toast.error("Erreur lors de l'envoi du signalement");
+        console.error({res});
         throw new Error("Erreur lors de l'envoi du signalement");
       }
 
@@ -89,7 +90,7 @@ export function ReportIncidentDialog({
 
       });
     } catch (error) {
-      console.error(error);
+      console.error({error});
       alert("Une erreur est survenue");
     } finally {
       setLoading(false);

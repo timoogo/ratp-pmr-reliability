@@ -47,43 +47,62 @@ async function main() {
     await prisma.equipmentRepair.deleteMany();
     await prisma.equipment.deleteMany();
     await prisma.station.deleteMany();
-    for (const station of stations_1.mockStations) {
+    const normalStations = stations_1.mockStations.filter((s) => toSlug(s.name) !== "station-de-test-pour-les-ascenseurs");
+    const specialStation = stations_1.mockStations.find((s) => toSlug(s.name) === "station-de-test-pour-les-ascenseurs");
+    for (const station of [...normalStations, specialStation]) {
         try {
             const equipmentData = equipments_1.stationEquipmentsMap[station.name] ?? [];
             const createdStation = await prisma.station.create({
                 data: {
                     name: station.name,
-                    code: station.code,
+                    code: toSlug(station.name) === "station-de-test-pour-les-ascenseurs"
+                        ? "STATION_TEST_UNIQUE"
+                        : station.code,
                     slug: toSlug(station.name),
                     line: station.line,
                     family: station.family,
                     stationOrder: station.stationOrder,
                     equipments: {
-                        create: [
-                            ...equipmentData.map((data, i) => ({
-                                name: `Ascenseur ${i + 1}`,
-                                code: `ART_IDFM_${Math.floor(100000 + Math.random() * 900000)}`,
-                                type: client_1.EquipmentType.ASCENSEUR,
-                                status: random(Object.values(client_1.EquipmentStatus)),
-                                ...data,
-                            })),
-                            {
-                                name: "Escalator",
-                                code: `ART_IDFM_${Math.floor(100000 + Math.random() * 900000)}`,
-                                type: client_1.EquipmentType.ESCALATOR,
-                                status: random(Object.values(client_1.EquipmentStatus)),
-                                situation: "Hall principal",
-                                direction: "Vers sortie",
-                            },
-                            ...Array.from({ length: 4 }, (_, j) => ({
-                                name: `Portillon ${j + 1}`,
-                                code: `ART_IDFM_${Math.floor(100000 + Math.random() * 900000)}`,
-                                type: client_1.EquipmentType.PORTILLONS,
-                                status: random(Object.values(client_1.EquipmentStatus)),
-                                situation: "Zone d'accès",
-                                direction: "Entrée",
-                            })),
-                        ],
+                        create: (() => {
+                            const baseStatus = random(Object.values(client_1.EquipmentStatus));
+                            if (toSlug(station.name) === "station-de-test-pour-les-ascenseurs") {
+                                return [
+                                    {
+                                        name: `Ascenseur 1`,
+                                        code: `ART_IDFM_${Math.floor(100000 + Math.random() * 900000)}`,
+                                        type: client_1.EquipmentType.ASCENSEUR,
+                                        status: baseStatus,
+                                        situation: "Hall test",
+                                        direction: "Vers test",
+                                    },
+                                ];
+                            }
+                            return [
+                                ...equipmentData.map((data, i) => ({
+                                    name: `Ascenseur ${i + 1}`,
+                                    code: `ART_IDFM_${Math.floor(100000 + Math.random() * 900000)}`,
+                                    type: client_1.EquipmentType.ASCENSEUR,
+                                    status: random(Object.values(client_1.EquipmentStatus)),
+                                    ...data,
+                                })),
+                                {
+                                    name: "Escalator",
+                                    code: `ART_IDFM_${Math.floor(100000 + Math.random() * 900000)}`,
+                                    type: client_1.EquipmentType.ESCALATOR,
+                                    status: random(Object.values(client_1.EquipmentStatus)),
+                                    situation: "Hall principal",
+                                    direction: "Vers sortie",
+                                },
+                                ...Array.from({ length: 4 }, (_, j) => ({
+                                    name: `Portillon ${j + 1}`,
+                                    code: `ART_IDFM_${Math.floor(100000 + Math.random() * 900000)}`,
+                                    type: client_1.EquipmentType.PORTILLONS,
+                                    status: random(Object.values(client_1.EquipmentStatus)),
+                                    situation: "Zone d'accès",
+                                    direction: "Entrée",
+                                })),
+                            ];
+                        })(),
                     },
                 },
             });
@@ -91,7 +110,7 @@ async function main() {
                 where: { stationId: createdStation.id },
             });
             for (const equipment of equipments) {
-                const history = generateStatusHistory(equipment.status, 10); // le dernier = statut actuel
+                const history = generateStatusHistory(equipment.status, 10);
                 for (let i = 0; i < history.length; i++) {
                     const date = new Date(Date.now() - 1000 * 60 * 60 * 24 * (history.length - 1 - i));
                     await prisma.equipmentHistory.create({

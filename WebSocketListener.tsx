@@ -1,72 +1,36 @@
 "use client";
 
-import { useEffect } from "react";
-import { toast } from "sonner";
-import { socket } from "@/utils/socket";
-import {
-  CheckCircle,
-  XCircle,
-  Wrench,
-  Info,
-} from "lucide-react";
+import { useEffect, useRef } from "react";
+import { typedSocket } from "@/utils/typed-socket";
+import type { SocketEventMap } from "@/types/socket-events";
 
-type IncidentPayload = {
-  station: string;
-  label: string;
-  equipmentId: string;
-  status: "DISPONIBLE" | "INDISPONIBLE" | "EN_MAINTENANCE" | string;
+type ListenerConfig = {
+  [K in keyof SocketEventMap]?: (payload: SocketEventMap[K]) => void;
 };
 
-const getToastOptions = (status: IncidentPayload["status"]) => {
-  switch (status) {
-    case "DISPONIBLE":
-      return { type: "success", icon: <CheckCircle className="text-green-600 w-5 h-5" /> };
-    case "INDISPONIBLE":
-      return { type: "error", icon: <XCircle className="text-red-600 w-5 h-5" /> };
-    case "EN_MAINTENANCE":
-      return { type: "warning", icon: <Wrench className="text-yellow-600 w-5 h-5" /> };
-    default:
-      return { type: "default", icon: <Info className="text-muted-foreground w-5 h-5" /> };
-  }
+type WebSocketListenerProps = {
+  listeners: ListenerConfig;
 };
 
-export function WebSocketListener() {
+export function WebSocketListener({ listeners }: WebSocketListenerProps) {
+  const hasMountedRef = useRef(false);
+
   useEffect(() => {
+    if (hasMountedRef.current) return;
+    hasMountedRef.current = true;
 
-    socket.on("connect", () => {
-      console.log("WebSocketListener@socket.on#connect");
-    });
+    const entries = Object.entries(listeners) as [keyof SocketEventMap, (payload: any) => void][];
 
-    socket.on("disconnect", () => {
-      console.log("WebSocketListener@socket.on#disconnect");
-    });
-
-    console.log("WebSocketListener@useEffect#onMount");
-    socket.on("incident-reported", (data: IncidentPayload) => {
-      const { label, station, status } = data;
-      const options = getToastOptions(status);
-
-      console.log("WebSocketListener@socket.on#incident-reported", data);
-      toast(`${label} à ${station}`, {
-        description: `Statut : ${status}`,
-        ...options,
-      });
-    });
-
-
-    socket.on("history-validated", (data: { message: string }) => {
-        toast("Mise à jour validée", {
-          description: data.message,
-          icon: <CheckCircle className="text-green-600 w-5 h-5" />,
-        });
-      });
-      
+    for (const [event, handler] of entries) {
+      typedSocket.on(event, handler);
+    }
 
     return () => {
-      socket.off("incident-reported");
-      socket.off("history-validated");
+      for (const [event, handler] of entries) {
+        typedSocket.off(event, handler);
+      }
     };
-  }, []);
+  }, [listeners]);
 
   return null;
 }

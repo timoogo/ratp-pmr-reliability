@@ -1,12 +1,11 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
-export async function POST(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
-  const { id } = params;
+export async function POST(req: NextRequest) {
+  const url = new URL(req.url);
+  const id = url.pathname.split("/").at(-2); // car /[id]/validate
 
   if (!id) {
     return NextResponse.json({ error: "ID manquant" }, { status: 400 });
@@ -18,7 +17,6 @@ export async function POST(
       data: { pending: false },
     });
 
-    // 🔥 Envoie l'événement au serveur WebSocket
     await fetch("http://ws:3001/broadcast", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

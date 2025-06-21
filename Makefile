@@ -4,16 +4,16 @@ GID := $(shell id -g)
 ENV_VARS = UID=$(UID) GID=$(GID)
 
 build-dev:
-	$(ENV_VARS) docker-compose -f docker-compose.dev.yml build
+	$(ENV_VARS) docker-compose -f docker-compose.yml build
 
 build-prod:
 	$(ENV_VARS) docker-compose -f docker-compose.yml build
 
 start-dev:
-	$(ENV_VARS) docker-compose -f docker-compose.dev.yml up
+	$(ENV_VARS) docker-compose -f docker-compose.yml up
 
 stop-dev:
-	$(ENV_VARS) docker-compose -f docker-compose.dev.yml down
+	$(ENV_VARS) docker-compose -f docker-compose.yml down
 
 start-prod:
 	$(ENV_VARS) docker-compose -f docker-compose.yml up
@@ -22,7 +22,7 @@ stop-prod:
 	$(ENV_VARS) docker-compose -f docker-compose.yml down
 
 test:
-	$(ENV_VARS) docker-compose -f docker-compose.dev.yml exec app npm run test
+	$(ENV_VARS) docker-compose -f docker-compose.yml exec app npm run test
 
 reset-db:
 	$(ENV_VARS) docker compose down -v
@@ -48,6 +48,10 @@ reset-db:
 reseed:
 	$(ENV_VARS) docker compose exec web npm run build:seed
 	$(ENV_VARS) docker compose exec web node dist/prisma/seed.js
+
+restart:
+	make stop-dev
+	make start-dev
 
 prune:
 	-docker compose down -v --remove-orphans

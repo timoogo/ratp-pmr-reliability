@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { EquipmentStatus } from "@prisma/client";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -22,7 +22,11 @@ export async function POST(req: NextRequest) {
   // 🔍 Récupère l'équipement concerné
   const equipment = await prisma.equipment.findUnique({
     where: { id: body.equipmentId },
+    include: {
+      station: true,
+    },
   });
+  console.log("📦 Equipment:", equipment);
 
   if (!equipment) {
     return NextResponse.json(
@@ -62,13 +66,23 @@ export async function POST(req: NextRequest) {
     },
   });
 
+  
+
   await fetch("http://ws:3001/notify", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      station: equipment.stationId, // ou autre champ pertinent
+      station: {
+        name: equipment.station.name,
+        code: equipment.station.code,
+        line: equipment.station.line,
+        family: equipment.station.family,
+        slug: equipment.station.slug,
+        type: equipment.type, // ✅ ici le type doit être mis à l'intérieur de station
+      },
       label: equipment.name,
       equipmentId: equipment.id,
+      equipmentCode: equipment.code,
       status: equipment.status,
     }),
   });

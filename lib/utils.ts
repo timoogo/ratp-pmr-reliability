@@ -1,9 +1,9 @@
 import { EquipmentType } from "@prisma/client";
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 type Options = {
@@ -40,10 +40,13 @@ export function formatFromOptions<T extends string>(
   input: T,
   options?: Options
 ): { raw: T; label: string } {
-  const base =
-    input in equipmentNameMap
-      ? equipmentNameMap[input as EquipmentType] // enum → label
-      : input; // string direct (ex : nom de station)
+  if (!input) {
+    return { raw: input, label: "" };
+  }
+
+  const baseKey = input?.toUpperCase() as EquipmentType;
+
+  const base = baseKey in equipmentNameMap ? equipmentNameMap[baseKey] : input;
 
   const label = formatLabel(base, options);
   return { raw: input, label };

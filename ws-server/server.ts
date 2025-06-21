@@ -10,10 +10,18 @@ const io = new Server(httpServer, {
 
 app.use(express.json());
 
-type IncidentPayload = {
-  station: string;
+type EquipmentStatusPayload = {
+  station: {
+    name: string;
+    code: string;
+    line: string;
+    slug: string;
+    type: string;
+    family: string;
+  };
   label: string;
   equipmentId: string;
+  equipmentCode: string;
   status: string;
 };
 
@@ -48,17 +56,17 @@ app.post("/broadcast", broadcastHandler);
 const notifyHandler: RequestHandler<
   {},
   ErrorResponse | void,
-  IncidentPayload
+    EquipmentStatusPayload
 > = (req, res) => {
-  const { station, label, equipmentId, status } = req.body;
+  const { station, label, equipmentId, equipmentCode, status } = req.body;
 
-  if (!station || !label || !equipmentId || !status) {
+  if (!station || !label || !equipmentId || !equipmentCode || !status) {
     res.status(400).json({ error: "Champs manquants dans la requête" });
     return;
   }
 
   console.log("server.ts@post#notify", req.body);
-  io.emit("incident-reported", { station, label, equipmentId, status });
+  io.emit("equipment-status-updated", { station, label, equipmentId, equipmentCode, status });
   res.sendStatus(204);
 };
 

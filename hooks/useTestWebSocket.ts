@@ -1,13 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
-import { io } from "socket.io-client";
+import { socket } from "@/utils/socket";
 
 export function useTestWebSocket() {
   useEffect(() => {
-    const socket = io(process.env.NEXT_PUBLIC_WS_URL!, {
-      transports: ["websocket"],
-    });
 
     socket.on("connect", () => {
       console.log("✅ Connecté au serveur WebSocket");

@@ -107,6 +107,19 @@ export const mockStations: StationWithEquipments[] = [
   },
   {
     stationOrder: 9,
+    name: "Gare de Lyon",
+    slug: "gare-de-lyon",
+    status: "ok",
+    family: "metro",
+    code: "ART_IDFM_473111",
+    line: "14",
+    lineSymbol: "M",
+    equipments: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    stationOrder: 9,
     name: "Bercy",
     slug: "bercy",
     status: "ok",
@@ -118,6 +131,7 @@ export const mockStations: StationWithEquipments[] = [
     createdAt: new Date(),
     updatedAt: new Date(),
   },
+
   {
     stationOrder: 10,
     name: "Cour Saint-Emilion",
@@ -151,6 +165,22 @@ export const mockStations: StationWithEquipments[] = [
     status: "ok",
     family: "metro",
     code: "ART_IDFM_479056",
+    line: "14",
+    lineSymbol: "M",
+    equipments: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+
+
+  {
+    // station de test pour les ascenseurs
+    stationOrder: 0,
+    name: "Station de test pour les ascenseurs",
+    slug: "station-de-test-pour-les-ascenseurs",
+    status: "ok",
+    family: "metro",
+    code: "ART_IDFM_473111",
     line: "14",
     lineSymbol: "M",
     equipments: [],
