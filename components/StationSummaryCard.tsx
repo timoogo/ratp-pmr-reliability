@@ -2,26 +2,19 @@
 
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { useEffect } from "react";
 
 type StationSummaryCardProps = {
   equipmentByType: Record<string, { total: number; available: number }>;
   lastUpdate: string;
-  onUpdate?: (formatted: string) => void;
 };
 
 export function StationSummaryCard({
   equipmentByType,
   lastUpdate,
-  onUpdate,
 }: StationSummaryCardProps) {
   const formattedDate = format(new Date(lastUpdate), "dd/MM/yyyy HH:mm", {
     locale: fr,
   });
-
-  useEffect(() => {
-    onUpdate?.(formattedDate);
-  }, [formattedDate, onUpdate]);
 
   return (
     <div className="space-y-2 px-2 py-3">

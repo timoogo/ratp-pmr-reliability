@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
+  const { description, equipmentId, status } = body;
 
   const ip =
     req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
@@ -12,7 +13,7 @@ export async function POST(req: NextRequest) {
 
   const userAgent = req.headers.get("user-agent") ?? "inconnu";
 
-  if (!body.description || !body.equipmentId) {
+  if (!description || !equipmentId || !status) {
     return NextResponse.json(
       { error: "Champs requis manquants" },
       { status: 400 }
@@ -21,7 +22,7 @@ export async function POST(req: NextRequest) {
 
   // 🔍 Récupère l'équipement concerné
   const equipment = await prisma.equipment.findUnique({
-    where: { id: body.equipmentId },
+    where: { id: equipmentId },
     include: {
       station: true,
     },
@@ -37,20 +38,20 @@ export async function POST(req: NextRequest) {
 
   let createdHistory = null;
 
-  // 🛠️ Si l'équipement est DISPONIBLE, on le passe en INDISPONIBLE + on crée un historique
-  if (equipment.status === EquipmentStatus.DISPONIBLE) {
+  // Met à jour le statut uniquement s'il est différent
+  if (status !== equipment.status) {
     await prisma.equipment.update({
       where: { id: equipment.id },
       data: {
-        status: EquipmentStatus.INDISPONIBLE,
+        status: status as EquipmentStatus,
       },
     });
 
     createdHistory = await prisma.equipmentHistory.create({
       data: {
         equipmentId: equipment.id,
-        status: EquipmentStatus.INDISPONIBLE,
-        comment: "Statut mis à jour automatiquement suite à un signalement",
+        status: status as EquipmentStatus,
+        comment: "Statut mis à jour suite à un signalement",
         date: new Date(),
       },
     });
@@ -59,15 +60,14 @@ export async function POST(req: NextRequest) {
   // ✅ Enregistre le signalement
   const report = await prisma.incidentReport.create({
     data: {
-      description: body.description,
-      equipmentId: body.equipmentId,
+      description,
+      equipmentId,
       ip,
       userAgent,
     },
   });
 
-  
-
+  // Envoie la notification via WebSocket
   await fetch("http://ws:3001/notify", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -78,20 +78,19 @@ export async function POST(req: NextRequest) {
         line: equipment.station.line,
         family: equipment.station.family,
         slug: equipment.station.slug,
-        type: equipment.type, // ✅ ici le type doit être mis à l'intérieur de station
+        type: equipment.type,
       },
       label: equipment.name,
       equipmentId: equipment.id,
       equipmentCode: equipment.code,
-      status: equipment.status,
+      status: status,
     }),
   });
-  
 
   return NextResponse.json(
     {
       incident: report,
-      history: createdHistory, // peut être `null` si pas de mise à jour
+      history: createdHistory,
     },
     { status: 201 }
   );

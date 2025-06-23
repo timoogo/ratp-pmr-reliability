@@ -10,7 +10,24 @@ build-prod:
 	$(ENV_VARS) docker-compose -f docker-compose.yml build
 
 start-dev:
-	$(ENV_VARS) docker-compose -f docker-compose.yml up
+	$(ENV_VARS) docker compose down -v
+	sudo chown -R $(UID):$(GID) prisma/migrations || true
+	sudo chown -R $(UID):$(GID) node_modules/.prisma || true
+	rm -rf prisma/migrations
+	rm -rf node_modules/.prisma
+
+	# 🚀 Démarre tous les services
+	$(ENV_VARS) docker compose up -d
+
+	# 💾 Migration + génération Prisma
+	$(ENV_VARS) docker compose exec web npx prisma migrate dev --name init
+	$(ENV_VARS) docker compose exec web npx prisma generate
+
+	# 👤 Permissions build dist
+	$(ENV_VARS) sudo chown -R $(UID):$(GID) dist || true
+
+	# ✅ Prisma Studio (lancé localement, non bloquant)
+	make prisma-studio
 
 stop-dev:
 	$(ENV_VARS) docker-compose -f docker-compose.yml down
@@ -45,8 +62,8 @@ reset-db:
 	$(ENV_VARS) docker compose exec web npm run build:seed
 	$(ENV_VARS) docker compose exec web node dist/prisma/seed.js
 
-	# ✅ Prisma studio
-	$(ENV_VARS) docker compose exec web npx prisma studio
+	# ✅ Prisma studio with detached mode
+	$(ENV_VARS) docker compose exec web npx prisma studio &
 
 reseed:
 	$(ENV_VARS) docker compose exec web npm run build:seed
@@ -80,3 +97,6 @@ prisma-migrate:
 
 # ✅ Enchaîner les deux
 prisma-setup: prisma-validate prisma-migrate
+
+prisma-studio:
+	docker compose exec web npx prisma studio

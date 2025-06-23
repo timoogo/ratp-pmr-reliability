@@ -10,7 +10,7 @@ export function useTestWebSocket() {
       console.log("✅ Connecté au serveur WebSocket");
     });
 
-    socket.on("incident-reported", (data) => {
+    socket.on("equipment-status-updated", (data) => {
       console.log("📡 Incident reçu :", data);
       alert(`Incident à ${data.station} : ${data.label} est ${data.status}`);
     });

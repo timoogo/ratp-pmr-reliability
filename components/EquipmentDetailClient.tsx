@@ -13,9 +13,9 @@ import { ContentCardWrapper } from "@/components/ContentCardWrapper";
 import { ReportIncidentDialog } from "@/components/form-modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { IncidentWithEquipmentAndHistories } from "@/types/history";
 import { IncidentList } from "./IncidentList";
 import { EquipmentTimeline } from "./equipment-timeline";
-import { IncidentWithEquipmentAndHistories } from "@/types/history";
 
 export type FrontendEquipmentHistory = {
   id: string;
@@ -65,8 +65,12 @@ function getStatusColorClass(status: EquipmentStatus): string {
 }
 
 export default function EquipmentDetailClient({ equipmentData }: Props) {
-  const [incidents, setIncidents] = useState<IncidentWithEquipmentAndHistories[]>([]);
-  const [equipmentStatus, setEquipmentStatus] = useState<EquipmentStatus>(equipmentData.status);
+  const [incidents, setIncidents] = useState<
+    IncidentWithEquipmentAndHistories[]
+  >([]);
+  const [equipmentStatus, setEquipmentStatus] = useState<EquipmentStatus>(
+    equipmentData.status
+  );
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [hasReportedIncident, setHasReportedIncident] = useState(false);
   const [histories, setHistories] = useState<EquipmentHistory[]>([]);
@@ -84,14 +88,18 @@ export default function EquipmentDetailClient({ equipmentData }: Props) {
   }, [equipmentData.id]);
 
   const handleValidate = (id: string) => {
-    setHistories((prev) => prev.map((h) => (h.id === id ? { ...h, pending: false } : h)));
+    setHistories((prev) =>
+      prev.map((h) => (h.id === id ? { ...h, pending: false } : h))
+    );
   };
 
   const INCIDENT_RECENT_THRESHOLD_HOURS = 2;
   const recentIncidents = incidents.filter((incident) => {
     const createdAt = new Date(incident.createdAt).getTime();
     const now = Date.now();
-    return (now - createdAt) / (1000 * 60 * 60) <= INCIDENT_RECENT_THRESHOLD_HOURS;
+    return (
+      (now - createdAt) / (1000 * 60 * 60) <= INCIDENT_RECENT_THRESHOLD_HOURS
+    );
   });
 
   const fetchHistories = useCallback(async () => {
@@ -119,37 +127,41 @@ export default function EquipmentDetailClient({ equipmentData }: Props) {
 
       <ContentCardWrapper>
         <div className="flex items-center gap-2">
-          <Badge variant="outline" className={getStatusColorClass(equipmentStatus)}>
+          <Badge
+            variant="outline"
+            className={getStatusColorClass(equipmentStatus)}
+          >
             {formatEquipmentStatusLabel(equipmentStatus)}
           </Badge>
-<Button
-  className="ml-4"
-  variant="secondary"
-  onClick={async () => {
-    const res = await fetch(`/api/debug/history`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        equipmentId: equipmentData.id,
-        status: equipmentStatus,
-        comment: "Ajout manuel",
-      }),
-    });
+          <Button
+            className="ml-4"
+            variant="secondary"
+            onClick={async () => {
+              const res = await fetch(`/api/debug/history`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  equipmentId: equipmentData.id,
+                  status: equipmentStatus,
+                  comment: "Ajout manuel",
+                }),
+              });
 
-    if (res.ok) {
-      const newHistory = await res.json();
-      await fetchHistories(); // ou bien setHistories(prev => [...prev, newHistory])
-    } else {
-      console.error("Erreur lors de l'ajout de l'historique");
-    }
-  }}
->
-  Ajouter un historique (débug)
-</Button>
+              if (res.ok) {
+                const newHistory = await res.json();
+                await fetchHistories(); // ou bien setHistories(prev => [...prev, newHistory])
+              } else {
+                console.error("Erreur lors de l'ajout de l'historique");
+              }
+            }}
+          >
+            Ajouter un historique (débug)
+          </Button>
 
           {recentIncidents.length > 1 && (
             <Badge variant="warning" className="text-sm text-carbon-500">
-              {recentIncidents.length} usagers ont signalé un incident récemment.
+              {recentIncidents.length} usagers ont signalé un incident
+              récemment.
             </Badge>
           )}
           {equipmentStatus === EquipmentStatus.EN_MAINTENANCE && (
@@ -174,7 +186,7 @@ export default function EquipmentDetailClient({ equipmentData }: Props) {
         <ContentCardWrapper className="flex-1">
           <h2 className="text-lg font-bold mb-2">Incidents signalés (débug)</h2>
           <p>Ca va dégager dans la version de démo</p>
-          <IncidentList incidents={incidents} >
+          <IncidentList incidents={incidents}>
             {/* pour l'incident, on affiche toutes les informations */}
           </IncidentList>
         </ContentCardWrapper>
@@ -193,41 +205,7 @@ export default function EquipmentDetailClient({ equipmentData }: Props) {
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         equipmentId={equipmentData.id}
-        onIncidentReported={async () => {
-          const res = await fetch("/api/incident", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              equipmentId: equipmentData.id,
-              description: "Signalement automatique suite à un incident",
-            }),
-          });
-        
-          if (!res.ok) {
-            // gestion d’erreur éventuelle ici
-            return;
-          }
-        
-          const { incident, history } = await res.json();
-        
-          // met à jour les incidents
-          await fetchIncidents();
-          await fetchEquipment();
-          setHasReportedIncident(true);
-        
-          // si une ligne d'historique a été créée, on l’ajoute à la timeline
-          if (history) {
-            setHistories((prev) => [
-              {
-                ...history,
-                createdAt: new Date(history.createdAt).toISOString(),
-                date: new Date(history.date).toISOString(),
-              },
-              ...prev,
-            ]);
-          }
-        }}
-        
+        onIncidentReported={async () => {}}
         onIncidentAdded={(item) => {
           setHistories((prev) => [...prev, item]);
         }}

@@ -11,6 +11,7 @@ type StationHeaderProps = {
   total: number;
   status: StationStatus;
   lastUpdate?: string;
+  isUpdated?: boolean;
 };
 
 export function StationHeader({
@@ -36,9 +37,16 @@ export function StationHeader({
     return isStale ? "bg-gray-400" : base;
   };
 
+
+
+
   return (
-    <div className="flex items-center justify-between py-2">
-      <div className="flex items-center gap-2">
+<div
+  className={cn(
+    "px-4 py-2 w-full flex items-center justify-between transition-colors duration-300"
+  )}
+>
+     <div className="flex items-center gap-2">
         <span className={cn("w-3 h-3 rounded-full", getDotColor())} />
         <Link href={`/etat-equipement/${station.family}/${station.line}/${station.slug}`} className="font-medium text-base">
           {station.name}

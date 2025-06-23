@@ -7,15 +7,15 @@ type EquipmentLike = {
   };
   
 
+const AVAILABLE_STATUS = ["DISPONIBLE"]; // tous les statuts considérés comme OK
+function getStationStatus(equipments: { status: string }[]): "DISPONIBLE" | "PARTIEL" | "INDISPONIBLE" {
+  const total = equipments.length;
+  const available = equipments.filter(e => AVAILABLE_STATUS.includes(e.status)).length;
 
-function getStationStatus(equipments: EquipmentLike[]): "DISPONIBLE" | "PARTIEL" | "INDISPONIBLE" {
-    const total = equipments.length;
-    const available = equipments.filter(e => e.status === "DISPONIBLE").length;
-  
-    if (available === total) return "DISPONIBLE";
-    if (available === 0) return "INDISPONIBLE";
-    return "PARTIEL";
-  }
+  if (available === total) return "DISPONIBLE";
+  if (available === 0) return "INDISPONIBLE";
+  return "PARTIEL";
+}
   
   function getSummaryByType(equipments: EquipmentLike[]) {
     const result: Record<string, { available: number; total: number }> = {};

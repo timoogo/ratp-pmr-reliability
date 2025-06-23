@@ -1,25 +1,44 @@
 "use client";
 
 import { useEffect } from "react";
-import { WebSocketListener } from "@/WebSocketListener";
-import { getGlobalSocketListeners } from "@/config/websocket-listeners";
-import { useShallowMemoObject } from "@/hooks/useShallowMemoObject";
+import { socket } from "@/utils/socket";
+import { toast } from "sonner";
+import { CheckCircle, XCircle, Wrench, Info } from "lucide-react";
+import { getToastOptions } from "@/utils/toast-utils";
+
+type IncidentPayload = {
+  station: {
+    name: string;
+    slug: string;
+  };
+  label: string;
+  equipmentId: string;
+  status: "DISPONIBLE" | "INDISPONIBLE" | "EN_MAINTENANCE" | string;
+};
+
+    
 
 export function WebSocketListenerClient() {
-  const listeners = useShallowMemoObject(getGlobalSocketListeners());
-
   useEffect(() => {
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker
-        .register("/sw.js")
-        .then((reg) => {
-          console.log("✅ SW enregistré :", reg);
-        })
-        .catch((err) => {
-          console.error("❌ Échec SW :", err);
-        });
-    }
+    socket.on("equipment-status-updated", (incoming: IncidentPayload) => {
+      console.log("📩 equipment-status-updated reçu :", incoming);
+
+      const { station, label, status } = incoming;
+      const options = getToastOptions(status);
+
+      toast(
+        `${label} à ${station.name}`,
+        {
+          icon: options.icon,
+          description: `Statut : ${status}`,
+        }
+      );
+    });
+
+    return () => {
+      socket.off("equipment-status-updated");
+    };
   }, []);
 
-  return <WebSocketListener listeners={listeners} />;
+  return null;
 }

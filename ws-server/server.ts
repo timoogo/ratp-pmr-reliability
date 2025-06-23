@@ -64,11 +64,19 @@ const notifyHandler: RequestHandler<
     res.status(400).json({ error: "Champs manquants dans la requête" });
     return;
   }
+  console.log("Envoi notify", {
+    station,
+    label,
+    equipmentId,
+    equipmentCode,
+    status,
+  });
 
   console.log("server.ts@post#notify", req.body);
   io.emit("equipment-status-updated", { station, label, equipmentId, equipmentCode, status });
   res.sendStatus(204);
 };
+
 
 app.post("/notify", notifyHandler);
 

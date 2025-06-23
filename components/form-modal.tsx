@@ -54,9 +54,9 @@ export function ReportIncidentDialog({
       const res = await fetch("/api/incident", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ description, equipmentId }),
+        body: JSON.stringify({ description, equipmentId, status: selectedStatus }),
       });
-
+      console.log("res", res);
       if (!res.ok) {
         toast.error("Erreur lors de l'envoi du signalement");
         console.error({res});
