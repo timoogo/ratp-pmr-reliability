@@ -20,14 +20,10 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // 🔍 Récupère l'équipement concerné
   const equipment = await prisma.equipment.findUnique({
     where: { id: equipmentId },
-    include: {
-      station: true,
-    },
+    include: { station: true },
   });
-  console.log("📦 Equipment:", equipment);
 
   if (!equipment) {
     return NextResponse.json(
@@ -36,9 +32,23 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // ✅ Logique de confirmation automatique (seuil ici : 3 incidents en 2h)
+  const INCIDENT_THRESHOLD = 3;
+  const TIME_WINDOW_HOURS = 2;
+
+  const recentReports = await prisma.incidentReport.findMany({
+    where: {
+      equipmentId,
+      createdAt: {
+        gte: new Date(Date.now() - TIME_WINDOW_HOURS * 60 * 60 * 1000),
+      },
+    },
+  });
+
+  const autoConfirm = recentReports.length >= INCIDENT_THRESHOLD;
+
   let createdHistory = null;
 
-  // Met à jour le statut uniquement s'il est différent
   if (status !== equipment.status) {
     await prisma.equipment.update({
       where: { id: equipment.id },
@@ -53,11 +63,11 @@ export async function POST(req: NextRequest) {
         status: status as EquipmentStatus,
         comment: "Statut mis à jour suite à un signalement",
         date: new Date(),
+        pending: !autoConfirm, // ✅ confirmé si seuil atteint
       },
     });
   }
 
-  // ✅ Enregistre le signalement
   const report = await prisma.incidentReport.create({
     data: {
       description,
@@ -67,7 +77,6 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  // Envoie la notification via WebSocket
   await fetch("http://ws:3001/notify", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

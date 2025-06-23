@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { EquipmentHistoryWithPending } from "@/types/equipement";
 import { EquipmentStatus } from "@prisma/client";
 import {
@@ -31,6 +31,7 @@ interface Props {
   onIncidentReported: () => void;
   onIncidentAdded?: (item: EquipmentHistoryWithPending) => void;
   newStatus: EquipmentStatus;
+  onStatusChange: (status: EquipmentStatus) => void;
 }
 
 export function ReportIncidentDialog({
@@ -40,62 +41,64 @@ export function ReportIncidentDialog({
   onIncidentReported,
   onIncidentAdded,
   newStatus,
+  onStatusChange,
 }: Props) {
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<EquipmentStatus>(newStatus);
 
-
+  useEffect(() => {
+    if (open) {
+      setSelectedStatus(newStatus);
+    }
+  }, [newStatus, open]);
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
+  
     try {
       const res = await fetch("/api/incident", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ description, equipmentId, status: selectedStatus }),
       });
-      console.log("res", res);
+  
       if (!res.ok) {
         toast.error("Erreur lors de l'envoi du signalement");
-        console.error({res});
         throw new Error("Erreur lors de l'envoi du signalement");
       }
-
-      const newIncident = await res.json();
-
+  
+      const { history } = await res.json();
       onIncidentReported();
-
-      const historyRes = await fetch(
-        `/api/equipment/${equipmentId}/histories`
-      );
-      const histories: EquipmentHistoryWithPending[] = await historyRes.json();
-
-      const mostRecent = histories
-        .filter((h) => h.pending)
-        .sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() -
-            new Date(a.createdAt).getTime()
-        )[0];
-
-      if (mostRecent) onIncidentAdded?.(mostRecent);
-
+  
+      if (history) {
+        onIncidentAdded?.(history);
+        onStatusChange(selectedStatus);
+      }
+  
       setDescription("");
       onOpenChange(false);
-      toast.success("Signalement envoyé avec succès", {
-        description: "Votre signalement a bien été pris en compte",
+  
+      // ✅ Lisibilité : consts explicites pour le message
+      const baseMessage = "Signalement envoyé avec succès";
+      const confirmed = history && history.pending === false;
+      const descriptionText = confirmed
+        ? "Incident confirmé automatiquement grâce aux autres signalements"
+        : "Votre signalement a bien été pris en compte";
+  
+      toast.success(baseMessage, {
+        description: descriptionText,
         duration: 5000,
-
       });
     } catch (error) {
-      console.error({error});
+      console.error({ error });
       alert("Une erreur est survenue");
     } finally {
       setLoading(false);
     }
   };
+  
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

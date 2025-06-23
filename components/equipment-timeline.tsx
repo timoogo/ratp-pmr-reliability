@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { AccordionCard } from "@/components/ui/accordion-card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -8,7 +9,6 @@ import { EquipmentStatus } from "@prisma/client";
 import { AlertTriangle, CheckCircle, Wrench } from "lucide-react";
 
 // Types
-
 type Props = {
   histories: FrontendEquipmentHistory[];
   onValidate?: (id: string) => void;
@@ -23,6 +23,7 @@ type GroupedHistory = {
   items: EquipmentHistory[];
 };
 
+// Helpers
 function formatStatus(status: EquipmentStatus): string {
   switch (status) {
     case EquipmentStatus.DISPONIBLE:
@@ -77,6 +78,21 @@ function getStatusConfig(status: EquipmentStatus) {
   }
 }
 
+function displaySkeleton() {
+  return (
+    <div className="animate-pulse space-y-6">
+      {[...Array(3)].map((_, i) => (
+        <div key={i} className="flex items-center gap-4">
+          <div className="w-16 sm:w-28 md:w-36 h-4 bg-gray-200 rounded" />
+          <div className="w-4 h-4 bg-gray-200 rounded-full" />
+          <div className="w-8 h-0.5 bg-gray-200" />
+          <div className="flex-1 h-12 bg-gray-200 rounded-lg" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function groupAndSortHistories(histories: EquipmentHistory[]): GroupedHistory[] {
   if (!histories.length) return [];
 
@@ -86,16 +102,25 @@ function groupAndSortHistories(histories: EquipmentHistory[]): GroupedHistory[] 
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 
-  const [pending, confirmed] = sorted.reduce<
-    [EquipmentHistory[], EquipmentHistory[]]
-  >(([p, c], h) => (h.pending ? [[...p, h], c] : [p, [...c, h]]), [[], []]);
+  const pendingGroups = new Map<EquipmentStatus, EquipmentHistory[]>();
+  const confirmed: EquipmentHistory[] = [];
 
-  if (pending.length) {
+  for (const h of sorted) {
+    if (h.pending) {
+      const key = h.status as EquipmentStatus;
+      if (!pendingGroups.has(key)) pendingGroups.set(key, []);
+      pendingGroups.get(key)!.push(h);
+    } else {
+      confirmed.push(h);
+    }
+  }
+
+  for (const [status, items] of pendingGroups.entries()) {
     result.push({
-      status: pending[0].status as EquipmentStatus,
-      count: pending.length,
-      createdAt: pending[0].createdAt,
-      items: pending,
+      status,
+      count: items.length,
+      createdAt: items[0].createdAt,
+      items,
     });
   }
 
@@ -113,7 +138,6 @@ function groupAndSortHistories(histories: EquipmentHistory[]): GroupedHistory[] 
     if (h.status === currentGroup.status) {
       currentGroup.items.push(h);
       currentGroup.count++;
-      // mise à jour si plus récente
       if (new Date(h.createdAt) > new Date(currentGroup.createdAt)) {
         currentGroup.createdAt = h.createdAt;
       }
@@ -132,7 +156,6 @@ function groupAndSortHistories(histories: EquipmentHistory[]): GroupedHistory[] 
   return result;
 }
 
-
 function formatDateTime(dateString: string) {
   const date = new Date(dateString);
   return {
@@ -149,11 +172,33 @@ function formatDateTime(dateString: string) {
   };
 }
 
-
-
-
+// Composant principal
 
 export function EquipmentTimeline({ histories, onValidate }: Props) {
+  const [waiting, setWaiting] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setWaiting(false), 10000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!histories.length) {
+    return (
+      <div className="w-full max-w-4xl mx-auto p-4 sm:p-6 bg-white">
+        <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-6 sm:mb-8">
+          Historique
+        </h2>
+        {waiting ? (
+          displaySkeleton()
+        ) : (
+          <p className="text-muted-foreground text-sm">
+            Pas d'historique trouvé pour cet équipement.
+          </p>
+        )}
+      </div>
+    );
+  }
+
   const grouped = groupAndSortHistories(histories);
 
   const handleValidatePending = async (item: EquipmentHistory) => {
@@ -161,49 +206,15 @@ export function EquipmentTimeline({ histories, onValidate }: Props) {
       const res = await fetch(`/api/incident/${item.id}/validate`, {
         method: "POST",
       });
-  
+
       if (!res.ok) throw new Error("Erreur lors de la validation");
-  
-      onValidate?.(item.id); // ici, déclenche la MAJ locale
+
+      onValidate?.(item.id);
     } catch (e) {
       console.error(e);
       alert("La validation a échoué");
     }
   };
-
-
-  if (!histories.length) {
-    return (
-      <div className="w-full max-w-4xl mx-auto p-4 sm:p-6 bg-white">
-        <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-6 sm:mb-8">
-          Historique
-        </h2>
-        <div className="animate-pulse space-y-6">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="flex items-center gap-4">
-              <div className="w-16 sm:w-28 md:w-36 h-4 bg-gray-200 rounded" />
-              <div className="w-4 h-4 bg-gray-200 rounded-full" />
-              <div className="w-8 h-0.5 bg-gray-200" />
-              <div className="flex-1 h-12 bg-gray-200 rounded-lg" />
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (!histories.length) {
-    return (
-      <div className="w-full max-w-4xl mx-auto p-4 sm:p-6 bg-white">
-        <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-6 sm:mb-8">
-          Historique
-        </h2>
-        <p className="text-muted-foreground text-sm">
-          Aucun historique disponible.
-        </p>
-      </div>
-    );
-  }
 
   return (
     <div className="p-4 sm:p-6 bg-white">
@@ -218,10 +229,7 @@ export function EquipmentTimeline({ histories, onValidate }: Props) {
             const isPending = group.items[0].pending === true;
 
             return (
-              <div
-                key={`group-${index}`}
-                className="relative flex items-start group"
-              >
+              <div key={`group-${group.status}-${index}`} className="relative flex items-start group">
                 <div className="w-16 sm:w-28 md:w-36 flex-shrink-0 text-right pr-3 sm:pr-4 md:pr-6">
                   <div className="text-xs sm:text-sm font-semibold text-gray-900 leading-tight">
                     {time}
@@ -240,24 +248,14 @@ export function EquipmentTimeline({ histories, onValidate }: Props) {
                   />
                 </div>
 
-                <div
-                  className={cn(
-                    "w-6 sm:w-8 md:w-12 h-0.5 ml-2 sm:ml-3 mt-2",
-                    config.lineColor
-                  )}
-                />
+                <div className={cn("w-6 sm:w-8 md:w-12 h-0.5 ml-2 sm:ml-3 mt-2", config.lineColor)} />
 
                 <div className="flex-1 ml-2 sm:ml-3">
                   <AccordionCard
                     value={`details-${index}`}
                     defaultOpen={index === 0}
                     icon={
-                      <Icon
-                        className={cn(
-                          "w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0",
-                          config.textColor
-                        )}
-                      />
+                      <Icon className={cn("w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0", config.textColor)} />
                     }
                     title={formatStatus(group.status)}
                     badges={
@@ -268,22 +266,18 @@ export function EquipmentTimeline({ histories, onValidate }: Props) {
                           </Badge>
                         )}
                         {index === 0 && (
-                          <Badge
-                            variant="primary"
-                            className="text-xs bg-blue-100 text-blue-700 hover:bg-blue-200"
-                          >
+                          <Badge variant="primary" className="text-xs bg-blue-100 text-blue-700 hover:bg-blue-200">
                             Actuel
                           </Badge>
                         )}
                         {isPending && (
                           <Badge
-                          variant="outline"
-                          className="text-gray-500 border-gray-300 bg-white cursor-pointer hover:bg-gray-100"
-                          onClick={() => handleValidatePending(group.items[0])}
-                        >
-                          À valider
-                        </Badge>
-                        
+                            variant="outline"
+                            className="text-gray-500 border-gray-300 bg-white cursor-pointer hover:bg-gray-100"
+                            onClick={() => handleValidatePending(group.items[0])}
+                          >
+                            À valider
+                          </Badge>
                         )}
                       </>
                     }
@@ -314,8 +308,7 @@ export function EquipmentTimeline({ histories, onValidate }: Props) {
                         })}
                         {group.items.length > 3 && (
                           <p className="text-xs text-gray-500 italic">
-                            ... et {group.items.length - 3} autre(s)
-                            signalement(s)
+                            ... et {group.items.length - 3} autre(s) signalement(s)
                           </p>
                         )}
                       </div>

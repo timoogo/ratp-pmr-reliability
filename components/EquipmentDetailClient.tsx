@@ -108,11 +108,31 @@ export default function EquipmentDetailClient({ equipmentData }: Props) {
     setHistories(data);
   }, [equipmentData.id]);
 
+
+const refreshEquipmentData = useCallback(async () => {
+  await fetchIncidents();
+  await fetchHistories();
+  await fetchEquipment();
+  setHasReportedIncident(true);
+}, [fetchIncidents, fetchHistories, fetchEquipment]);
+
+
+const updateEquipmentStatus = (status: EquipmentStatus) => {
+  setEquipmentStatus(status);
+};
+
   useEffect(() => {
     fetchIncidents();
     fetchHistories();
   }, [fetchIncidents, fetchHistories]);
 
+  useEffect(() => {
+    if (hasReportedIncident) {
+      const timeout = setTimeout(() => setHasReportedIncident(false), 7000);
+      return () => clearTimeout(timeout);
+    }
+  }, [hasReportedIncident]);
+  
   return (
     <div className="p-4 flex flex-col gap-4 bg-gray-100 min-h-screen">
       <h1 className="text-2xl font-bold">
@@ -205,11 +225,12 @@ export default function EquipmentDetailClient({ equipmentData }: Props) {
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         equipmentId={equipmentData.id}
-        onIncidentReported={async () => {}}
+        onIncidentReported={refreshEquipmentData}
         onIncidentAdded={(item) => {
           setHistories((prev) => [...prev, item]);
         }}
         newStatus={equipmentStatus}
+        onStatusChange={updateEquipmentStatus}
       />
     </div>
   );
