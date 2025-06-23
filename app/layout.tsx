@@ -8,7 +8,7 @@ import "@/app/globals.css";
 import { Header } from "@/components/Header";
 import { SubHeader } from "@/components/SubHeader";
 import { WebSocketListenerClient } from "@/components/WebSocketListenerClient";
-
+import { ToastListener } from "@/components/ToastListener";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -35,6 +35,7 @@ export default function RootLayout({
         <Header />
         <SubHeader />
         <WebSocketListenerClient />
+        <ToastListener />
         <main>{children}</main>
         <Toaster />
       </body>

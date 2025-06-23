@@ -96,6 +96,21 @@ export async function POST(req: NextRequest) {
     }),
   });
 
+
+  // Ajout en file d'attente pour traitement différé (notifications push)
+try {
+  await prisma.notificationQueue.create({
+    data: {
+      equipmentId: equipment.id,
+      excludedEndpoint: body.subscriptionEndpoint ?? null,
+    },
+  });
+} catch (queueError) {
+  console.warn("⚠️ Erreur lors de la mise en queue pour notification :", queueError);
+  // On n’interrompt pas l’API pour ça
+}
+
+
   return NextResponse.json(
     {
       incident: report,

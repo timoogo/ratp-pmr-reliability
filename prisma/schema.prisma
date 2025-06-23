@@ -68,6 +68,7 @@ model Equipment {
   repairs         EquipmentRepair[]
   incidents       IncidentReport[]    @relation("EquipmentIncidents")
   displayHistory  Json               @default("{}")
+  notificationQueue NotificationQueue[]
   createdAt       DateTime           @default(now())
   updatedAt       DateTime           @updatedAt
 }
@@ -123,8 +124,26 @@ model PushSubscription {
   endpoint   String
   keys       Json
   station    String
-  frequency  String
+  frequency  SubscriptionFrequency
   types      String[]
 
   @@unique([endpoint, station])
+}
+model NotificationQueue {
+  id               String   @id @default(cuid())
+  equipmentId      String
+  excludedEndpoint String? // le signalant, s’il y en a un
+
+  createdAt        DateTime @default(now())
+  sentAt           DateTime?
+  status           QueueStatus @default(PENDING)
+  errorMessage     String?
+
+  equipment        Equipment @relation(fields: [equipmentId], references: [id])
+}
+
+enum QueueStatus {
+  PENDING
+  SENT
+  FAILED
 }
