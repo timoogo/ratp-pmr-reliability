@@ -2,15 +2,12 @@ import { LineStatusClient } from "@/components/LineStatusClient";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 
-type Props = {
-  params: {
-    family: string;
-    line: string;
-  };
-};
 
-export default async function LineStatusPage({ params }: Props) {
-  const { family, line } = params;
+
+export default async function LineStatusPage({ params }: {
+  params: Promise<{ family: string; line: string }>;
+}) {
+  const { family, line } = await params;
 
   const dbStations = await prisma.station.findMany({
     where: {

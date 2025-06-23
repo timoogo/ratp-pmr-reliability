@@ -17,6 +17,23 @@ services:
       - ratp_network
     volumes:
       - pgdata:/var/lib/postgresql/data
+  notifier:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+      target: builder
+      args:
+        DATABASE_URL: postgres://postgres:postgres@db:5432/ratp_pmr
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/ratp_pmr
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY}
+    command: sh -c "while true; do node --import tsx scripts/processNotificationQueue.ts; sleep 30; done"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - ratp_network
+
 
   web:
     extra_hosts:
