@@ -9,21 +9,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { EquipmentStatus, EquipmentType } from "@prisma/client";
+import { Station } from "@/types/equipement";
 import { IterationCw } from "lucide-react";
 
-type Station = {
-  name: string;
-  slug: string;
-  line: string;
-  family: string;
-  equipments: {
-    id: string;
-    type: EquipmentType;
-    status: EquipmentStatus;
-    updatedAt: string;
-  }[];
-};
 
 type Props = {
   line: string;

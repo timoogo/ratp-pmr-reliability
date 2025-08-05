@@ -1,6 +1,6 @@
 // File: /components/ui/StationStepper.tsx
 import { StationRow } from "@/components/StationRow";
-import { EquipmentType } from "@prisma/client";
+import { EquipmentType } from "@/types/equipement";
 import {
   Stepper,
   StepperItem,

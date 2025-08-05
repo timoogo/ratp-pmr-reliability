@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useEffect, useState } from "react";
 import { EquipmentHistoryWithPending } from "@/types/equipement";
-import { EquipmentStatus } from "@prisma/client";
+import { EquipmentStatus } from "@/types/equipement";
 import {
   Select,
   SelectContent,

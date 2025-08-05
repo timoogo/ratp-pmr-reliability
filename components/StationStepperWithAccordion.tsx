@@ -12,7 +12,7 @@ import {
 } from "@/utils/helpers";
 import { onSubscribe } from "@/utils/onSubscribe";
 import { socket } from "@/utils/socket";
-import { EquipmentType, Station, SubscriptionFrequency } from "@prisma/client";
+import { EquipmentType, Station, SubscriptionFrequency } from "@/types/equipement";
 import { useEffect, useState } from "react";
 import { StationHeader } from "./StationHeader";
 import { StationSubscriptionForm } from "./StationSubscriptionForm";
@@ -48,7 +48,7 @@ export function StationStepperWithAccordion({
   const [updatedStations, setUpdatedStations] = useState<Set<string>>(new Set());
   const [lastUpdates, setLastUpdates] = useState<Record<string, string>>({});
   const [localsubscriptions, setLocalsubscriptions] = useState<
-    Record<string, { types: string[]; frequency: keyof typeof SubscriptionFrequency }>
+    Record<string, { types: string[]; frequency: SubscriptionFrequency }>
   >({});
 
   // Met à jour les lastUpdates à chaque changement d'équipements
@@ -148,8 +148,8 @@ export function StationStepperWithAccordion({
 
         const map = data.reduce(
           (
-            acc: Record<string, { types: string[]; frequency: keyof typeof SubscriptionFrequency }>,
-            sub: { station: string; types: string[]; frequency: keyof typeof SubscriptionFrequency }
+            acc: Record<string, { types: string[]; frequency: SubscriptionFrequency }>,
+            sub: { station: string; types: string[]; frequency: SubscriptionFrequency }
           ) => {
             acc[sub.station] = { types: sub.types, frequency: sub.frequency };
             return acc;

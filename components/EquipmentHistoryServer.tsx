@@ -17,7 +17,7 @@ export const EquipmentHistoryServer = async ({ equipmentId }: Props) => {
 
   return (
     <ul className="space-y-2">
-      {histories.map((history) => (
+      {histories.map((history: any) => (
         <li key={history.id} className="text-sm">
           <p>
             <span className="font-semibold">{formatStatus(history.status)}</span>{" "}

@@ -1,31 +1,64 @@
-// File: /app/etat-equipement/[family]/[line]/[station]/[type]/[equipmentId]/page.tsx
 import EquipmentDetailClient from "@/components/EquipmentDetailClient";
 import { prisma } from "@/lib/prisma";
-import { EquipmentType } from "@prisma/client";
+import {
+  EquipmentType as EquipmentTypeClient,
+  EquipmentStatus as EquipmentStatusClient,
+} from "@/types/equipement";
+import { EquipmentStatus as EquipmentStatusPrisma, EquipmentType as EquipmentTypePrisma } from "@prisma/client";
 import { notFound } from "next/navigation";
 
-function getEquipmentTypeFromSlug(slug: string): EquipmentType | undefined {
+function getEquipmentTypeFromSlug(slug: string): EquipmentTypeClient | undefined {
   switch (slug) {
     case "ascenseurs":
-      return EquipmentType.ASCENSEUR;
+      return EquipmentTypeClient.ASCENSEUR;
     case "escalators":
-      return EquipmentType.ESCALATOR;
+      return EquipmentTypeClient.ESCALATOR;
     case "portillons":
-      return EquipmentType.PORTILLONS;
+      return EquipmentTypeClient.PORTILLONS;
     case "cabinets":
-      return EquipmentType.CABINES;
+      return EquipmentTypeClient.CABINES;
     default:
       return undefined;
+  }
+}
+
+function mapStatus(status: EquipmentStatusPrisma): EquipmentStatusClient {
+  switch (status) {
+    case EquipmentStatusPrisma.DISPONIBLE:
+      return EquipmentStatusClient.DISPONIBLE;
+    case EquipmentStatusPrisma.INDISPONIBLE:
+      return EquipmentStatusClient.INDISPONIBLE;
+    case EquipmentStatusPrisma.EN_MAINTENANCE:
+      return EquipmentStatusClient.EN_MAINTENANCE;
+    default:
+      return EquipmentStatusClient.INDISPONIBLE; // fallback
+  }
+}
+
+function mapType(type: EquipmentTypePrisma): EquipmentTypeClient {
+  switch (type) {
+    case EquipmentTypePrisma.ASCENSEUR:
+      return EquipmentTypeClient.ASCENSEUR;
+    case EquipmentTypePrisma.ESCALATOR:
+      return EquipmentTypeClient.ESCALATOR;
+    case EquipmentTypePrisma.PORTILLONS:
+      return EquipmentTypeClient.PORTILLONS;
+    case EquipmentTypePrisma.CABINES:
+      return EquipmentTypeClient.CABINES;
+    default:
+      return EquipmentTypeClient.ASCENSEUR; // fallback
   }
 }
 
 export default async function EquipmentDetailPage({ params }: any) {
   const type = getEquipmentTypeFromSlug(params.type);
 
-  const equipmentData = await prisma.equipment.findUnique({
+  if (!type) return notFound();
+
+  const equipmentData = await prisma.equipment.findFirst({
     where: {
       code: params.equipmentId,
-      type,
+      type: type as any, // Prisma enum type
     },
     include: {
       station: true,
@@ -33,16 +66,45 @@ export default async function EquipmentDetailPage({ params }: any) {
       checks: true,
       repairs: true,
       incidents: { orderBy: { createdAt: "desc" } },
-      
     },
   });
 
   if (!equipmentData) return notFound();
 
+  // Mapping des enums Prisma vers ceux du client
+  const equipmentDataMapped = {
+    ...equipmentData,
+    status: mapStatus(equipmentData.status),
+    type: mapType(equipmentData.type),
+    histories: equipmentData.histories.map(h => ({
+      ...h,
+      date: h.date.toISOString(),
+      createdAt: h.createdAt.toISOString(),
+      status: mapStatus(h.status as EquipmentStatusPrisma),
+    })),
+    incidents: equipmentData.incidents.map((i: any) => ({
+      ...i,
+      createdAt: i.createdAt.toISOString(),
+      updatedAt: i.updatedAt.toISOString(),
+    })),
+    checks: equipmentData.checks.map((c: any) => ({
+      ...c,
+      createdAt: c.createdAt.toISOString(),
+      updatedAt: c.updatedAt.toISOString(),
+    })),
+    repairs: equipmentData.repairs.map((r: any)  => ({
+      ...r,
+      createdAt: r.createdAt.toISOString(),
+      updatedAt: r.updatedAt.toISOString(),
+    })),
+  };
+  
+  
+
   return (
     <>
       <EquipmentDetailClient
-        equipmentData={equipmentData}
+        equipmentData={equipmentDataMapped}
         maintenanceDuration={1000 * 60 * 60 * 24 * 7}
       />
     </>

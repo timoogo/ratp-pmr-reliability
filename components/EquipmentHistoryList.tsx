@@ -1,6 +1,6 @@
 "use client";
 import { cn } from "@/lib/utils";
-import { EquipmentStatus } from "@prisma/client";
+import { EquipmentStatus } from "@/types/equipement";
 import { AlertTriangle, CheckCircle, Wrench } from "lucide-react";
 import { useEffect, useState } from "react";
 import { GenericItemCard } from "./GenericItemCard";

@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { Station } from "@prisma/client";
+import { Station } from "@/types/equipement";
 import Link from "next/link";
 
 type StationStatus = "DISPONIBLE" | "PARTIEL" | "INDISPONIBLE";

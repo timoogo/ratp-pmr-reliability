@@ -14,12 +14,12 @@ export function IncidentList({
 
   return (
     <ul className="space-y-2 text-sm">
-      {incidents.map((incident) => (
+      {incidents.map((incident: any) => (
         <li key={incident.id}>
           <GenericItemCard
             item={incident}
             title="Détail de l’incident"
-            renderSummary={(i) => (
+            renderSummary={(i: any) => (
               <>
                 <p className="font-medium">{i.description}</p>
                 <p className="text-xs text-muted-foreground">
@@ -27,14 +27,14 @@ export function IncidentList({
                 </p>
               </>
             )}
-            renderDetails={(i) =>
+            renderDetails={(i: any) =>
               renderDetails ? renderDetails(i) : (
                 <>
                   <p><strong>Signalé le :</strong> {new Date(i.createdAt).toLocaleString("fr-FR")}</p>
                   <p><strong>Description :</strong> {i.description}</p>
                   <p><strong>Statut :</strong> {i.status}</p>
                   <p><strong>Équipement :</strong></p>
-                  <p><strong>Pending in history :</strong> {i.equipment.histories.some(h => h.pending) ? "Oui" : "Non"}</p>
+                  <p><strong>Pending in history :</strong> {i.equipment.histories.some((h: any) => h.pending) ? "Oui" : "Non"}</p>
                   <p className="ml-4"><strong>Code :</strong> {i.equipment.code}</p>
                   <p className="ml-4"><strong>Nom :</strong> {i.equipment.name}</p>
                   <p className="ml-4"><strong>Statut :</strong> {i.equipment.status}</p>

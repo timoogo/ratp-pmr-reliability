@@ -33,12 +33,12 @@ export async function GET(req: Request) {
   });
 
   return NextResponse.json(
-    stations.map((s) => ({
+    stations.map((s: any) => ({
       name: s.name,
       slug: s.slug,
       family,
       line,
-      equipments: s.equipments.map((e) => ({
+      equipments: s.equipments.map((e: any) => ({
         id: e.id,
         type: e.type,
         status: e.status,

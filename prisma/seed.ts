@@ -175,7 +175,7 @@ async function main() {
         console.log(`🔧 Historique généré pour ${equipment.name}: ${historiesCount} entrées`);
         console.log(`🛠️ Réparations simulées pour ${equipment.name}: ${repairsCount} entrées`);
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error(`❌ Erreur sur la station ${station.name} (${station.code}):`, e);
     }
   }
@@ -184,7 +184,7 @@ async function main() {
 }
 
 main()
-  .catch((e) => {
+  .catch((e: any) => {
     console.error("❌ Erreur lors du seed :", e);
     process.exit(1);
   })

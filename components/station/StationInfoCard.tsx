@@ -1,7 +1,7 @@
 // components/station/StationInfoCard.tsx
 import Link from "next/link";
 import { ContentCardWrapper } from "@/components/ContentCardWrapper";
-import { Equipment } from "@prisma/client";
+import { Equipment } from "@/types/equipement";
 import { EquipmentRow } from "./EquipmentRow";
 
 export const StationInfoCard = ({

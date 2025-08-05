@@ -1,3 +1,5 @@
+// app/api/debug/history/route.ts
+/*
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
@@ -29,3 +31,13 @@ export async function POST(req: Request) {
 
   return NextResponse.json(history);
 }
+
+
+*/
+import { NextResponse } from "next/server";
+
+ 
+
+export async function POST(req: Request) {
+  return NextResponse.json({ message: "Hello, world!" });
+} 

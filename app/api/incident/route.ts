@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { EquipmentStatus } from "@prisma/client";
+import { EquipmentStatus } from "@/types/equipement";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {

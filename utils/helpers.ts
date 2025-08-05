@@ -29,7 +29,7 @@ function getStationStatus(equipments: { status: string }[]): "DISPONIBLE" | "PAR
   
   function getLastUpdate(equipments: EquipmentLike[]) {
     return equipments
-      .map((e) => new Date(e.updatedAt).getTime())
+      .map((e:any) => new Date(e.updatedAt).getTime())
       .sort((a, b) => b - a)[0];
   }
   

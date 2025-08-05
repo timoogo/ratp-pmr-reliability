@@ -14,18 +14,25 @@ export default async function StationDetailPage({ params }: any) {
 
   if (!stationData) return notFound();
 
-  const filteredEquipments = stationData.equipments.filter(
-    (e) => {
-      const { label } = formatFromOptions(e.type, {
-        plural: true,
-        lowercase: true,
-      });
+  const filteredEquipments = stationData.equipments
+  .filter((e: any) => {
+    const { label } = formatFromOptions(e.type, {
+      plural: true,
+      lowercase: true,
+    });
+    return label === type;
+  })
+  .map((e: any) => ({
+    ...e,
+    station: {
+      id: stationData.id,
+      name: stationData.name,
+      slug: stationData.slug,
+      line: stationData.line,
+      family: stationData.family,
+    },
+  }));
 
-      console.log({label, type});
-
-      return label === type;
-    }
-  );
 
   return (
     <div className="p-6 flex flex-col gap-6 bg-gray-100 min-h-screen">

@@ -2,16 +2,16 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Checkbox } from "@/components/ui/checkbox";  
 import { Label } from "@/components/ui/label";
-import { EquipmentType, SubscriptionFrequency } from "@prisma/client";
+import { EquipmentType, SubscriptionFrequency } from "@/types/equipement";
 import { toast } from "sonner";
 
 type StationSubscriptionFormProps = {
   stationSlug: string;
   availableTypes: EquipmentType[];
   initialTypes: string[];
-  initialFrequency: keyof typeof SubscriptionFrequency;
+  initialFrequency: SubscriptionFrequency;
   onSubmit: (data: { types: string[]; frequency: SubscriptionFrequency }) => void;
 };
 
@@ -23,7 +23,7 @@ export function StationSubscriptionForm({
   onSubmit,
 }: StationSubscriptionFormProps) {
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
-  const [frequency, setFrequency] = useState<SubscriptionFrequency>("IMMEDIATE");
+  const [frequency, setFrequency] = useState<SubscriptionFrequency>(SubscriptionFrequency.IMMEDIATE);
 
   // Synchroniser les états avec les props initiales à chaque changement
   useEffect(() => {
@@ -80,9 +80,9 @@ export function StationSubscriptionForm({
           onChange={(e) => setFrequency(e.target.value as SubscriptionFrequency)}
           className="w-full max-w-xs"
         >
-          <option value="IMMEDIATE">Immédiat</option>
-          <option value="DAILY">Quotidien</option>
-          <option value="WEEKLY">Hebdomadaire</option>
+            <option value={SubscriptionFrequency.IMMEDIATE}>Immédiat</option>
+          <option value={SubscriptionFrequency.DAILY}>Quotidien</option>
+          <option value={SubscriptionFrequency.WEEKLY}>Hebdomadaire</option>
         </select>
       </div>
 

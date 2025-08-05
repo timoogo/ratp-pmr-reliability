@@ -16,6 +16,7 @@ export async function POST() {
 
   // Envoie les notifications
   const results = await Promise.allSettled(
+    // @ts-ignore
     subscriptions.map((sub) =>
       webPush.sendNotification(
         {

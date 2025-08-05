@@ -1,12 +1,7 @@
 // ✅ components/EquipmentDetailClient.tsx (corrigé)
 "use client";
 
-import {
-  Equipment,
-  EquipmentHistory,
-  EquipmentStatus,
-  IncidentReport,
-} from "@prisma/client";
+import { Equipment, EquipmentHistory, EquipmentStatus, IncidentReport } from "@/types/equipement";
 import { useCallback, useEffect, useState } from "react";
 
 import { ContentCardWrapper } from "@/components/ContentCardWrapper";

@@ -2,7 +2,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { EquipmentType, SubscriptionFrequency } from "@prisma/client";
-import { toast } from "sonner";
 
 export async function POST(req: Request) {
   try {

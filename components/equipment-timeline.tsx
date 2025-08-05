@@ -5,7 +5,7 @@ import { AccordionCard } from "@/components/ui/accordion-card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { FrontendEquipmentHistory } from "@/types/history";
-import { EquipmentStatus } from "@prisma/client";
+import { EquipmentStatus } from "@/types/equipement";
 import { AlertTriangle, CheckCircle, Wrench } from "lucide-react";
 
 // Types

@@ -31,10 +31,10 @@ export default async function LineStatusPage({ params }: {
 
   if (dbStations.length === 0) return notFound();
 
-  const stations = dbStations.map((s) => ({
+  const stations = dbStations.map((s: any) => ({
     name: s.name,
     slug: s.slug,
-    equipments: s.equipments.map((e) => ({
+    equipments: s.equipments.map((e: any) => ({
       id: e.id,
       type: e.type,
       status: e.status,

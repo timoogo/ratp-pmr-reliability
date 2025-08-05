@@ -101,7 +101,7 @@ if (require.main === module) {
       console.log("🚀 Fin de traitement");
       process.exit(0);
     })
-    .catch((err) => {
+    .catch((err: any) => {
       console.error("❌ Erreur générale :", err);
       process.exit(1);
     });

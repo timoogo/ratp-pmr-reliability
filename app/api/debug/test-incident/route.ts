@@ -1,3 +1,4 @@
+/*
 import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 import { EquipmentStatus, EquipmentType } from '@prisma/client';
@@ -60,4 +61,13 @@ export async function POST() {
     console.error('❌ Erreur test incident debug:', err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
+}
+
+
+*/ 
+
+import { NextResponse } from "next/server";
+
+export async function POST(req: Request) {
+  return NextResponse.json({ message: "Hello, world!" });
 }
