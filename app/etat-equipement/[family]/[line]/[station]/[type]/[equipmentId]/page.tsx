@@ -85,17 +85,17 @@ export default async function EquipmentDetailPage({ params }: any) {
     incidents: equipmentData.incidents.map((i: any) => ({
       ...i,
       createdAt: i.createdAt.toISOString(),
-      updatedAt: i.updatedAt.toISOString(),
+      updatedAt: i.updatedAt ? new Date(i.updatedAt).toISOString() : null,
     })),
     checks: equipmentData.checks.map((c: any) => ({
       ...c,
       createdAt: c.createdAt.toISOString(),
-      updatedAt: c.updatedAt.toISOString(),
+      updatedAt: c.updatedAt ? new Date(c.updatedAt).toISOString() : null,
     })),
     repairs: equipmentData.repairs.map((r: any)  => ({
       ...r,
       createdAt: r.createdAt.toISOString(),
-      updatedAt: r.updatedAt.toISOString(),
+      updatedAt: r.updatedAt ? new Date(r.updatedAt).toISOString() : null,
     })),
   };
   
