@@ -17,6 +17,7 @@ services:
       - ratp_network
     volumes:
       - pgdata:/var/lib/postgresql/data
+
   notifier:
     build:
       context: .
@@ -34,14 +35,13 @@ services:
     networks:
       - ratp_network
 
-
   web:
     extra_hosts:
       - "host.docker.internal:192.168.1.23"
     build:
       context: .
       dockerfile: Dockerfile.web
-      target: builder
+      target: runner
       args:
         DATABASE_URL: postgres://postgres:postgres@db:5432/ratp_pmr
     user: "${UID}:${GID}"
@@ -54,6 +54,7 @@ services:
       - "5555:5555"
     volumes:
       - .:/app
+      - /app/node_modules
     command: sh -c "npm run dev || tail -f /dev/null"
     depends_on:
       db:
@@ -64,18 +65,19 @@ services:
   ws:
     build:
       context: .
-      dockerfile: Dockerfile.ws
+      dockerfile: ./ws-server/Dockerfile.ws
     ports:
       - "3001:3001"
     volumes:
       - ./ws-server:/ws
+      - /ws/node_modules
     command: npm run start
-    networks:
-      - ratp_network
     depends_on:
       db:
         condition: service_healthy
     restart: always
+    networks:
+      - ratp_network
 
 volumes:
   pgdata:

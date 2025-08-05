@@ -199,8 +199,7 @@ const updateEquipmentStatus = (status: EquipmentStatus) => {
         </ContentCardWrapper>
 
         <ContentCardWrapper className="flex-1">
-          <h2 className="text-lg font-bold mb-2">Incidents signalés (débug)</h2>
-          <p>Ca va dégager dans la version de démo</p>
+          <h2 className="text-lg font-bold mb-2">Incidents signalés</h2>
           <IncidentList incidents={incidents}>
             {/* pour l'incident, on affiche toutes les informations */}
           </IncidentList>
